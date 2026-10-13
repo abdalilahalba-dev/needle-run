@@ -95,6 +95,21 @@
   }
   .btn.ghost { color: var(--panel-ink); background: #ece9ff; box-shadow: 0 4px 0 #c9c3f2; }
   .btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--player-dark); }
+  #ov-menu .card { gap: 10px; padding: 16px 20px; }
+  #ov-menu .title { font-size: 32px; }
+  .parts { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; }
+  .part {
+    border: 0; border-radius: 7px; cursor: pointer;
+    height: 30px;
+    background: #ece9ff; color: var(--panel-ink);
+    font: 700 13px var(--font-display);
+  }
+  .part.done { background: var(--zone); color: var(--zone-ink); }
+  .part.on { background: var(--panel-ink); color: #fff; }
+  .part:disabled { cursor: not-allowed; background: #f4f3fa; color: #c5c1dc; }
+  .part:focus-visible { outline: 3px solid var(--coin); outline-offset: 2px; }
+  .part-head { display: flex; justify-content: space-between; align-items: baseline; margin: 0; font-size: 13px; color: var(--panel-muted); }
+  .part-head b { font: 700 15px var(--font-display); color: var(--panel-ink); }
 </style>
 </head>
 <body>
@@ -111,7 +126,9 @@
     <div class="overlay" id="ov-menu">
       <div class="card">
         <h1 class="title"><i></i>NEEDLE RUN</h1>
-        <p class="lead">Steer the <b>red square</b> past the <b>blue dots</b>. Grab <b>every coin</b>, then reach the <b>green goal</b>. One touch and you start over. Green strips in the middle are checkpoints.</p>
+        <p class="lead">Dodge the <b>blue dots</b>, grab <b>every coin</b>, reach the <b>green goal</b>. 10 parts, 10 levels each. Every part is harder than the last.</p>
+        <div class="parts" id="part-tabs"></div>
+        <p class="part-head"><b id="part-name">PART 1</b><span id="part-progress"></span></p>
         <div class="grid" id="lvl-grid"></div>
         <p class="keys">Arrow keys or WASD to move · R to restart · On a phone, drag anywhere to steer</p>
       </div>
@@ -189,6 +206,152 @@
         ...O(14, 6, [1, 2, 2.75], 4, 2), LOOP([[11, 2], [16, 2], [16, 9], [11, 9]], 4, 4)],
       coins: [[3, 2], [8, 9], [13, 5], [16, 2]] }
   ];
+
+  // ---------- parts 2-10: built from patterns, harder every part ----------
+  const PARTS = [
+    { name: 'Basics',     a: '#f4f2ff', b: '#e8e4ff', wall: '#2d2766' },
+    { name: 'Spin cycle', a: '#effaf8', b: '#d9f1ec', wall: '#164e4a' },
+    { name: 'Rush hour',  a: '#fff8ea', b: '#f9eac6', wall: '#5a3a0e' },
+    { name: 'Tight fit',  a: '#fff1f4', b: '#f9dbe3', wall: '#5b1730' },
+    { name: 'Clockwork',  a: '#eef6ff', b: '#d7e8ff', wall: '#173b66' },
+    { name: 'Storm',      a: '#f5fbe9', b: '#e2f1c4', wall: '#2f4a12' },
+    { name: 'Overdrive',  a: '#fff3ea', b: '#ffdcc2', wall: '#6a2c0a' },
+    { name: 'Chaos',      a: '#f7efff', b: '#e6d5ff', wall: '#3d1a6b' },
+    { name: 'Nightmare',  a: '#eef0f4', b: '#d8dce5', wall: '#1f2430' },
+    { name: 'Impossible', a: '#3a2f57', b: '#32284c', wall: '#0b0816', dark: true }
+  ];
+  LEVELS.forEach((lv) => { lv.part = 1; });
+
+  function makeRng(seed) {
+    return () => {
+      seed = (seed + 0x6d2b79f5) | 0;
+      let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  const SWITCHBACK_MAP = LEVELS[2].map;
+
+  function buildLevel(part, idx) {
+    const rnd = makeRng(part * 1000 + idx * 37 + 7);
+    const R = {
+      f: (a, b) => a + (b - a) * rnd(),
+      i: (a, b) => a + Math.floor(rnd() * (b - a + 1)),
+      pick: (arr) => arr[Math.floor(rnd() * arr.length)],
+      shuffle: (arr) => { const a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+    };
+    // difficulty 0..1: each part starts clearly above the one before
+    const d = Math.min(1, ((part - 2) / 8) * 0.85 + (idx / 9) * 0.15);
+    const sp = (a, b) => (a + (b - a) * d) * R.f(0.94, 1.06);
+    const coinCount = 2 + Math.round(d * 3);
+    const pickCoins = (m, k) => {
+      const cells = [];
+      m.forEach((row, r) => [...row].forEach((ch, c) => { if (ch === '.') cells.push([c, r]); }));
+      const out = [];
+      for (const cell of R.shuffle(cells)) {
+        if (out.length >= k) break;
+        if (out.every(([c, r]) => Math.abs(c - cell[0]) + Math.abs(r - cell[1]) >= 3)) out.push(cell);
+      }
+      return out;
+    };
+    const everyOther = (from, to) => { const out = []; for (let c = from; c <= to; c += 2) out.push(c); return out; };
+
+    const T_ = {
+      columns() {
+        const top = R.pick([2, 3]), bot = top === 2 ? 9 : 8;
+        const m = map([[top, bot, ROOM]]);
+        const mode = R.pick(['alt', 'wave', 'rand']), k = R.f(0.06, 0.14), s = sp(2.6, 6.2);
+        const en = everyOther(R.pick([4, 5]), 16).map((c, i) => V(c, top, bot, s, mode === 'alt' ? (i % 2) * 0.5 : mode === 'wave' ? i * k : R.f(0, 1)));
+        if (d > 0.45) en.push(H(R.i(top + 2, bot - 2), 3, 16, sp(1.8, 4)));
+        if (d > 0.8) en.push(H(R.i(top + 1, bot - 1), 3, 16, sp(1.8, 4), 0.5));
+        return { name: 'Columns', map: m, enemies: en, coins: pickCoins(m, coinCount) };
+      },
+      spinner() {
+        const m = map([[2, 9, ROOM]]);
+        const n = R.pick(d > 0.6 ? [3, 4] : d > 0.3 ? [2, 3] : [2]);
+        const dir = R.pick([1, -1]);
+        const en = O(10, 6, d > 0.5 ? [1, 1.75, 2.5, 3.25] : [1, 2, 3], n, sp(1.3, 2.1) * dir, R.f(0, 6));
+        if (d > 0.4) en.push(...O(10, 6, [3.9], R.i(4, 6), -dir * sp(0.6, 1.2)));
+        return { name: 'Spinner', map: m, enemies: en, coins: pickCoins(m, coinCount) };
+      },
+      twin() {
+        const m = map([[2, 9, SPLIT]]);
+        const s = sp(1.5, 2.5);
+        const en = [...O(6, 6, [1, 2, 2.75], R.pick(d > 0.5 ? [2, 3] : [2]), s, R.f(0, 6)),
+          ...O(14, 6, [1, 2, 2.75], R.pick(d > 0.5 ? [3, 4] : [2, 3]), -s * R.f(0.8, 1), R.f(0, 6))];
+        return { name: 'Twin spin', map: m, enemies: en, coins: pickCoins(m, coinCount) };
+      },
+      racetrack() {
+        const m = map([[2, 9, ROOM]]);
+        const en = [LOOP([[3, 2], [16, 2], [16, 9], [3, 9]], 5 + Math.round(d * 4), sp(3, 6) * R.pick([1, -1])),
+          LOOP([[6, 4], [6, 7], [13, 7], [13, 4]], 3 + Math.round(d * 2), sp(2, 4.5))];
+        if (d > 0.55) en.push(LOOP([[8, 5], [11, 5], [11, 6], [8, 6]], 2, sp(1.5, 3)));
+        return { name: 'Racetrack', map: m, enemies: en, coins: pickCoins(m, coinCount) };
+      },
+      wave() {
+        const m = map([[4, 6, ROOM]]);
+        const k = R.f(0.08, 0.16), alt = rnd() < 0.3, s = sp(2.8, 5);
+        const en = everyOther(4, 16).map((c, i) => V(c, 4, 6, s, alt ? (i % 2) * 0.5 : i * k));
+        if (d > 0.5) en.push(H(5, 3, 16, sp(2, 3.5)));
+        return { name: 'The wave', map: m, enemies: en, coins: pickCoins(m, Math.min(coinCount, 3)) };
+      },
+      crossfire() {
+        const m = map([[2, 9, ROOM]]);
+        const en = [];
+        const sh = sp(2.3, 4.4), sv = sp(2.3, 4.4);
+        R.shuffle([3, 4, 5, 6, 7, 8]).slice(0, 2 + Math.round(d * 2)).forEach((r) => {
+          const o = R.f(0, 1);
+          en.push(H(r, 3, 16, sh * R.f(0.85, 1.1), o));
+          if (d > 0.5) en.push(H(r, 3, 16, sh, o + 0.5));
+        });
+        R.shuffle([5, 7, 9, 11, 13, 15]).slice(0, 2 + Math.round(d * 2)).forEach((c) => en.push(V(c, 2, 9, sv * R.f(0.85, 1.1), R.f(0, 1))));
+        return { name: 'Crossfire', map: m, enemies: en, coins: pickCoins(m, coinCount) };
+      },
+      windmill() {
+        const m = map([[2, 9, ROOM]]);
+        const en = O(10, 6, d > 0.3 ? [1, 1.75, 2.5, 3.25, 4] : [1, 1.75, 2.5, 3.25], R.pick(d > 0.5 ? [3, 4] : [2, 3]), sp(0.8, 1.5) * R.pick([1, -1]), R.f(0, 6));
+        return { name: 'Windmill', map: m, enemies: en, coins: pickCoins(m, coinCount) };
+      },
+      switchback() {
+        const m = SWITCHBACK_MAP;
+        const sv = sp(1.2, 2.1), sh = sp(2.5, 4);
+        const en = [
+          ...[5, 7, 9, 11, 13].map((c, i) => V(c, 2, 3, sv, (i % 2) * 0.5)),
+          H(4, 14, 17, sh, 0), H(5, 14, 17, sh, 0.5),
+          ...[4, 6, 8, 10, 12].map((c, i) => V(c, 6, 7, sv, ((i + 1) % 2) * 0.5)),
+          H(8, 2, 5, sp(2, 3.8))];
+        if (d > 0.6) en.push(V(16, 2, 3, sv, 0.25), V(14, 6, 7, sv, 0.75));
+        return { name: 'Switchback', map: m, enemies: en, coins: pickCoins(m, 3) };
+      },
+      boss() {
+        const m = map([[2, 9, SPLIT]]);
+        const en = [];
+        if (rnd() < 0.5) {
+          const s = sp(3, 6);
+          [4, 6, 8].forEach((c, i) => en.push(V(c, 2, 9, s, i * 0.25)));
+          if (d > 0.3) en.push(H(2, 3, 8, sp(2, 4)), H(9, 3, 8, sp(2, 4), 0.5));
+        } else {
+          const s = sp(2.5, 4);
+          [3, 4, 5, 6, 7, 8].forEach((c, i) => en.push(V(c, 2, 9, s, i * 0.08)));
+        }
+        en.push(...O(14, 6, [1, 2, 2.75], R.pick(d > 0.5 ? [3, 4] : [2, 3]), sp(1.5, 2.4) * R.pick([1, -1]), R.f(0, 6)));
+        if (d > 0.5) en.push(LOOP([[11, 2], [16, 2], [16, 9], [11, 9]], 3 + Math.round(d), sp(3, 5)));
+        return { name: 'Boss', map: m, enemies: en, coins: pickCoins(m, coinCount + 1) };
+      }
+    };
+
+    // the template order is fixed per part so each part uses every pattern once
+    const pr = makeRng(part * 7919);
+    const order = ['columns', 'spinner', 'twin', 'racetrack', 'wave', 'crossfire', 'windmill', 'switchback', ['columns', 'spinner', 'crossfire'][Math.floor(pr() * 3)]];
+    for (let i = order.length - 1; i > 0; i--) { const j = Math.floor(pr() * (i + 1)); [order[i], order[j]] = [order[j], order[i]]; }
+    const key = idx === 9 ? 'boss' : order[idx];
+    const lv = T_[key]();
+    lv.part = part;
+    return lv;
+  }
+  for (let p = 2; p <= 10; p++) for (let i = 0; i < 10; i++) LEVELS.push(buildLevel(p, i));
+  const partOf = (i) => Math.floor(i / 10) + 1;
+  const theme = () => PARTS[(L ? L.part : 1) - 1];
 
   // ---------- canvas sizing ----------
   const game = document.getElementById('game');
@@ -440,32 +603,61 @@
     $('clear-best').textContent = bests[key];
     $('clear-title').innerHTML = last ? '<i></i>YOU WON!' : '<i></i>CLEARED';
     const total = Object.values(bests).reduce((a, b) => a + b, 0);
+    const nextPart = partOf(levelIndex + 1);
+    const newPart = !last && nextPart !== partOf(levelIndex);
     $('clear-note').textContent = last
       ? `All ${LEVELS.length} levels beaten. Your fewest deaths across every level add up to ${total}. Go back and get that number down.`
-      : deaths === 0 ? 'Not a single death. Impressive.' : `Level ${levelIndex + 2} is unlocked.`;
+      : newPart ? `Part ${nextPart}: ${PARTS[nextPart - 1].name} is unlocked. It gets harder from here.`
+      : deaths === 0 ? 'Not a single death. Impressive.' : `Level ${nextPart}-${((levelIndex + 1) % 10) + 1} is unlocked.`;
     $('b-next').textContent = last ? 'PLAY AGAIN' : 'NEXT LEVEL';
     setTimeout(() => { $('ov-clear').hidden = false; $('b-next').focus(); }, 450);
   }
 
   // ---------- menu ----------
+  let menuPart = partOf(Math.min(unlocked, LEVELS.length) - 1);
   function openMenu() {
     state = 'menu';
     $('ov-clear').hidden = true;
+    if (L && L.part) menuPart = L.part;
+    $('ov-menu').hidden = false;
+    paintMenu(true);
+  }
+  function paintMenu(focus) {
+    const tabs = $('part-tabs');
+    tabs.innerHTML = '';
+    PARTS.forEach((pt, p) => {
+      const first = p * 10;
+      const b = document.createElement('button');
+      b.type = 'button';
+      const done = [...Array(10).keys()].every((k) => bests[first + k] !== undefined);
+      b.className = 'part' + (p + 1 === menuPart ? ' on' : done ? ' done' : '');
+      b.disabled = first + 1 > unlocked;
+      b.textContent = p + 1;
+      b.setAttribute('aria-label', `Part ${p + 1}, ${pt.name}${b.disabled ? ', locked' : ''}`);
+      b.addEventListener('click', () => { menuPart = p + 1; paintMenu(false); });
+      tabs.appendChild(b);
+    });
+    const base = (menuPart - 1) * 10;
+    const doneCount = [...Array(10).keys()].filter((k) => bests[base + k] !== undefined).length;
+    $('part-name').textContent = `PART ${menuPart} · ${PARTS[menuPart - 1].name.toUpperCase()}`;
+    $('part-progress').textContent = `${doneCount}/10 cleared`;
     const grid = $('lvl-grid');
     grid.innerHTML = '';
-    LEVELS.forEach((lv, i) => {
+    for (let k = 0; k < 10; k++) {
+      const i = base + k, lv = LEVELS[i];
       const b = document.createElement('button');
       b.type = 'button';
       b.className = 'lvl' + (bests[i] !== undefined ? ' done' : '');
       b.disabled = i + 1 > unlocked;
-      b.innerHTML = `${i + 1}<small>${b.disabled ? 'locked' : bests[i] !== undefined ? bests[i] + ' deaths' : lv.name}</small>`;
-      b.setAttribute('aria-label', `Level ${i + 1}, ${lv.name}${b.disabled ? ', locked' : ''}`);
+      b.innerHTML = `${k + 1}<small>${b.disabled ? 'locked' : bests[i] !== undefined ? bests[i] + ' deaths' : lv.name}</small>`;
+      b.setAttribute('aria-label', `Level ${menuPart}-${k + 1}, ${lv.name}${b.disabled ? ', locked' : ''}`);
       b.addEventListener('click', () => loadLevel(i));
       grid.appendChild(b);
-    });
-    $('ov-menu').hidden = false;
-    const first = grid.querySelector('.lvl:not(:disabled):not(.done)') || grid.querySelector('.lvl:not(:disabled)');
-    if (first) first.focus({ preventScroll: true });
+    }
+    if (focus) {
+      const first = grid.querySelector('.lvl:not(:disabled):not(.done)') || grid.querySelector('.lvl:not(:disabled)');
+      if (first) first.focus({ preventScroll: true });
+    }
   }
   $('t-menu').addEventListener('click', openMenu);
   $('t-restart').addEventListener('click', () => { if (state === 'play') restartLevel(); });
@@ -477,10 +669,11 @@
 
   // ---------- drawing ----------
   function drawBoard() {
+    const th = theme();
     for (let r = 0; r < ROWS; r++) {
       for (let c = 0; c < COLS; c++) {
         const ch = tiles[r][c], x = c * T, y = TOP + r * T;
-        if (ch === '#') { ctx.fillStyle = '#2d2766'; ctx.fillRect(x, y, T, T); continue; }
+        if (ch === '#') { ctx.fillStyle = th.wall; ctx.fillRect(x, y, T, T); continue; }
         if (ch === 'S' || ch === 'C' || ch === 'G') {
           const locked = ch === 'G' && coins.some((k) => k.state === 'free');
           ctx.fillStyle = locked ? '#cfe9da' : (c + r) % 2 ? '#a9ecc6' : '#9de4bb';
@@ -491,12 +684,12 @@
           }
           continue;
         }
-        ctx.fillStyle = (c + r) % 2 ? '#f4f2ff' : '#e8e4ff';
+        ctx.fillStyle = (c + r) % 2 ? th.a : th.b;
         ctx.fillRect(x, y, T, T);
       }
     }
     // wall edges: a darker line where wall meets floor
-    ctx.fillStyle = '#16123a';
+    ctx.fillStyle = 'rgba(0,0,0,0.45)';
     for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
       if (tiles[r][c] === '#') continue;
       const x = c * T, y = TOP + r * T;
@@ -539,7 +732,7 @@
     ctx.textAlign = 'left';
     ctx.fillStyle = '#ffcc1f';
     ctx.font = '700 15px Silkscreen, monospace';
-    const label = `${levelIndex + 1}/${LEVELS.length}`;
+    const label = `${L.part}-${(levelIndex % 10) + 1}`;
     ctx.fillText(label, 12, TOP / 2);
     const lw = ctx.measureText(label).width;
     ctx.fillStyle = '#f1efff';
@@ -598,10 +791,11 @@
     if (stick && state === 'play') {
       const r = cv.getBoundingClientRect();
       const ox = (stick.ox - r.left) / scale, oy = (stick.oy - r.top) / scale;
-      ctx.strokeStyle = 'rgba(45,39,102,0.35)'; ctx.lineWidth = 3;
+      const ink = theme().dark ? '255,255,255' : '45,39,102';
+      ctx.strokeStyle = `rgba(${ink},0.35)`; ctx.lineWidth = 3;
       ctx.beginPath(); ctx.arc(ox, oy, 40, 0, Math.PI * 2); ctx.stroke();
       const m = Math.hypot(stick.dx, stick.dy) / scale, f = m > 40 ? 40 / m : 1;
-      ctx.fillStyle = 'rgba(45,39,102,0.4)';
+      ctx.fillStyle = `rgba(${ink},0.4)`;
       ctx.beginPath(); ctx.arc(ox + (stick.dx / scale) * f, oy + (stick.dy / scale) * f, 14, 0, Math.PI * 2); ctx.fill();
     }
 
