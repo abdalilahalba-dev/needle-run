@@ -14,12 +14,10 @@
     --panel: #ffffff;
     --panel-ink: #1d1838;
     --panel-muted: #6b6690;
-    --wall: #2d2766;
     --player: #ff3b4a;
     --player-dark: #b3121f;
     --zone: #a9ecc6;
     --zone-ink: #11603a;
-    --enemy: #3d6bff;
     --coin: #ffcc1f;
     --font-display: "Silkscreen", "Courier New", monospace;
     --font-body: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
@@ -52,36 +50,46 @@
     cursor: pointer;
   }
   .tool:hover { background: rgba(255, 255, 255, 0.22); }
-  .tool:focus-visible, .btn:focus-visible, .lvl:focus-visible { outline: 3px solid var(--coin); outline-offset: 2px; }
+  .tool:focus-visible, .btn:focus-visible, .lvl:focus-visible, .part:focus-visible { outline: 3px solid var(--coin); outline-offset: 2px; }
 
   .overlay { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(20, 16, 50, 0.6); pointer-events: auto; padding-inline: 16px; }
   .card {
     width: 100%; max-width: 440px;
     background: var(--panel); color: var(--panel-ink);
     border-radius: 14px;
-    padding: 20px 22px;
+    padding: 18px 22px;
     display: grid; gap: 12px;
     box-shadow: 0 6px 0 #0f0c2b;
   }
-  .title { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: 38px; line-height: 1; letter-spacing: 0.01em; display: flex; align-items: center; gap: 12px; }
-  .title i { width: 26px; height: 26px; background: var(--player); border: 3px solid #2a0a10; border-radius: 3px; flex: none; }
-  .lead { margin: 0; color: var(--panel-muted); font-size: 14px; line-height: 1.45; }
+  #ov-menu .card { gap: 9px; padding: 16px 20px; }
+  .title { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: 34px; line-height: 1; display: flex; align-items: center; gap: 12px; }
+  #ov-menu .title { font-size: 30px; }
+  .title i { width: 24px; height: 24px; background: var(--player); border: 3px solid #2a0a10; border-radius: 3px; flex: none; }
+  .lead { margin: 0; color: var(--panel-muted); font-size: 13.5px; line-height: 1.45; }
   .lead b { color: var(--panel-ink); }
-  .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+  .parts { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; }
+  .part { border: 0; border-radius: 7px; cursor: pointer; height: 30px; background: #ece9ff; color: var(--panel-ink); font: 700 13px var(--font-display); }
+  .part.done { background: var(--zone); color: var(--zone-ink); }
+  .part.on { background: var(--panel-ink); color: #fff; }
+  .part:disabled { cursor: not-allowed; background: #f4f3fa; color: #c5c1dc; }
+  .part-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin: 0; font-size: 12.5px; color: var(--panel-muted); }
+  .part-head b { font: 700 14px var(--font-display); color: var(--panel-ink); }
+  .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 7px; }
   .lvl {
     border: 0; border-radius: 9px; cursor: pointer;
-    padding: 9px 4px 7px;
+    padding: 7px 3px 6px;
     background: #ece9ff; color: var(--panel-ink);
-    font: 700 18px var(--font-display);
-    display: grid; gap: 2px; justify-items: center;
+    font: 700 17px var(--font-display);
+    display: grid; gap: 1px; justify-items: center;
     box-shadow: 0 3px 0 #c9c3f2;
+    min-width: 0;
   }
-  .lvl small { font: 400 10px var(--font-body); color: var(--panel-muted); }
+  .lvl small { font: 400 9.5px var(--font-body); color: var(--panel-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
   .lvl.done { background: var(--zone); box-shadow: 0 3px 0 #6fcf9b; }
   .lvl.done small { color: var(--zone-ink); }
   .lvl:disabled { cursor: not-allowed; background: #f4f3fa; color: #c5c1dc; box-shadow: none; }
   .lvl:not(:disabled):active { transform: translateY(2px); box-shadow: 0 1px 0 #c9c3f2; }
-  .keys { margin: 0; font-size: 12px; color: var(--panel-muted); }
+  .keys { margin: 0; font-size: 11.5px; color: var(--panel-muted); }
   .stats { display: flex; gap: 22px; margin: 0; font-size: 14px; color: var(--panel-muted); font-variant-numeric: tabular-nums; }
   .stats b { display: block; font: 700 24px var(--font-display); color: var(--panel-ink); }
   .row { display: flex; gap: 10px; flex-wrap: wrap; }
@@ -95,21 +103,6 @@
   }
   .btn.ghost { color: var(--panel-ink); background: #ece9ff; box-shadow: 0 4px 0 #c9c3f2; }
   .btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--player-dark); }
-  #ov-menu .card { gap: 10px; padding: 16px 20px; }
-  #ov-menu .title { font-size: 32px; }
-  .parts { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; }
-  .part {
-    border: 0; border-radius: 7px; cursor: pointer;
-    height: 30px;
-    background: #ece9ff; color: var(--panel-ink);
-    font: 700 13px var(--font-display);
-  }
-  .part.done { background: var(--zone); color: var(--zone-ink); }
-  .part.on { background: var(--panel-ink); color: #fff; }
-  .part:disabled { cursor: not-allowed; background: #f4f3fa; color: #c5c1dc; }
-  .part:focus-visible { outline: 3px solid var(--coin); outline-offset: 2px; }
-  .part-head { display: flex; justify-content: space-between; align-items: baseline; margin: 0; font-size: 13px; color: var(--panel-muted); }
-  .part-head b { font: 700 15px var(--font-display); color: var(--panel-ink); }
 </style>
 </head>
 <body>
@@ -126,7 +119,7 @@
     <div class="overlay" id="ov-menu">
       <div class="card">
         <h1 class="title"><i></i>NEEDLE RUN</h1>
-        <p class="lead">Dodge the <b>blue dots</b>, grab <b>every coin</b>, reach the <b>green goal</b>. 10 parts, 10 levels each. Every part is harder than the last.</p>
+        <p class="lead">Grab <b>every coin</b>, reach the <b>green goal</b>, don't get touched. 10 parts, each with a new way to play. 100 different levels.</p>
         <div class="parts" id="part-tabs"></div>
         <p class="part-head"><b id="part-name">PART 1</b><span id="part-progress"></span></p>
         <div class="grid" id="lvl-grid"></div>
@@ -150,78 +143,98 @@
 
 <script>
 (() => {
-  // ---------- constants ----------
+  // =====================================================================
+  // constants
+  // =====================================================================
   const T = 32, COLS = 20, ROWS = 12, TOP = 40;
   const LW = COLS * T, LH = TOP + ROWS * T;
-  const P_SIZE = 20, P_SPEED = 140, E_R = 8;
+  const P_SIZE = 20, P_SPEED = 140, E_R = 8, B_R = 5;
+  const CONVEYOR_PUSH = 85;
+  const KEY_COLORS = ['#ff9f1c', '#14b8b8', '#d43ff0'];
+  const DIRS = { '>': [1, 0], '<': [-1, 0], 'v': [0, 1], '^': [0, -1] };
 
-  // ---------- level helpers ----------
+  const PARTS = [
+    { name: 'Basics',          a: '#f4f2ff', b: '#e8e4ff', wall: '#2d2766' },
+    { name: 'Bounce house',    a: '#effaf8', b: '#d9f1ec', wall: '#164e4a' },
+    { name: 'Lock and key',    a: '#fff8ea', b: '#f9eac6', wall: '#5a3a0e' },
+    { name: 'Laser grid',      a: '#fff1f4', b: '#f9dbe3', wall: '#5b1730' },
+    { name: 'Turret alley',    a: '#eef6ff', b: '#d7e8ff', wall: '#173b66' },
+    { name: 'Spike trap',      a: '#f5fbe9', b: '#e2f1c4', wall: '#2f4a12' },
+    { name: 'Ice rink',        a: '#f2fbff', b: '#e1f3fb', wall: '#1d4a63' },
+    { name: 'Conveyor chaos',  a: '#fff3ea', b: '#ffdcc2', wall: '#6a2c0a' },
+    { name: 'Portals & gates', a: '#f7efff', b: '#e6d5ff', wall: '#3d1a6b' },
+    { name: 'Lights out',      a: '#eef0f4', b: '#d8dce5', wall: '#14161f' }
+  ];
+
+  const FEATURE_TIPS = {
+    patrol: 'Blue dots patrol back and forth',
+    orbit: 'Spinning arms of dots',
+    bouncer: 'Purple dots bounce off the walls',
+    chaser: 'Dark dots chase you. Outrun them',
+    turret: 'Turrets in the walls fire orange bullets',
+    laser: 'Lasers flash on and off. Wait for the gap',
+    spike: 'Spikes pop out of the floor',
+    phase: 'Ghost dots only hurt when they are solid',
+    ice: 'Ice is slippery',
+    conveyor: 'Arrow belts push you around',
+    keys: 'Grab the key to open the door of the same color',
+    gate: 'Step on the button, then race through the gate before it shuts',
+    portal: 'Purple portals teleport you',
+    dark: 'Lights out: you only see around you',
+    timer: 'Beat the clock',
+    mirror: 'Mirror: left and right are swapped',
+    wind: 'Wind keeps pushing you'
+  };
+  const FEATURE_NAMES = {
+    patrol: 'Patrol', orbit: 'Spinners', bouncer: 'Bouncers', chaser: 'Chasers', turret: 'Turrets', laser: 'Lasers',
+    spike: 'Spikes', phase: 'Ghosts', ice: 'Ice', conveyor: 'Belts', keys: 'Keys', gate: 'Gate rush', portal: 'Portals',
+    dark: 'Lights out', timer: 'Clock', mirror: 'Mirror', wind: 'Wind'
+  };
+
+  // =====================================================================
+  // part 1: hand-made levels
+  // =====================================================================
   const WALL_ROW = '#'.repeat(COLS);
   const map = (bands) => { const m = Array(ROWS).fill(WALL_ROW); for (const [a, b, s] of bands) for (let r = a; r <= b; r++) m[r] = s; return m; };
   const V = (c, r1, r2, s, o = 0) => ({ p: [[c + 0.5, r1 + 0.5], [c + 0.5, r2 + 0.5]], s, o });
   const H = (r, c1, c2, s, o = 0) => ({ p: [[c1 + 0.5, r + 0.5], [c2 + 0.5, r + 0.5]], s, o });
   const O = (cx, cy, radii, n, s, a = 0) => radii.map((r) => ({ orbit: [cx, cy], r, n, s, a }));
   const LOOP = (pts, n, s) => ({ p: pts.map(([c, r]) => [c + 0.5, r + 0.5]), loop: true, n, s });
-
   const ROOM = '#SS..............GG#';
   const SPLIT = '#SS......CC......GG#';
 
-  const LEVELS = [
-    { name: 'Warm-up', map: map([[3, 8, '#SSS............GGG#']]),
-      enemies: [5, 7, 9, 11, 13, 15].map((c, i) => V(c, 3, 8, 4, i % 2 ? 0.5 : 0)),
-      coins: [[10, 3]] },
-    { name: 'Spinner', map: map([[2, 9, ROOM]]),
-      enemies: O(10, 6, [1, 2, 3], 2, 1.6),
-      coins: [[4, 2], [15, 9], [9, 5]] },
-    { name: 'Switchback', map: map([
-        [2, 3, '#SS...............##'], [4, 5, '##############....##'],
-        [6, 7, '##................##'], [8, 8, '##....##############'], [9, 9, '##GG..##############']]),
-      enemies: [
-        ...[5, 7, 9, 11, 13].map((c, i) => V(c, 2, 3, 1.5, i % 2 ? 0.5 : 0)),
-        H(4, 14, 17, 3, 0), H(5, 14, 17, 3, 0.5),
-        ...[4, 6, 8, 10, 12].map((c, i) => V(c, 6, 7, 1.5, i % 2 ? 0 : 0.5)),
-        H(8, 2, 5, 2.5, 0)],
+  const blankLevel = (o) => Object.assign({
+    enemies: [], bouncers: [], chasers: [], turrets: [], lasers: [], spikes: [], keys: [], doors: [], pads: [],
+    gate: null, coins: [], mods: {}, features: [], tip: ''
+  }, o);
+
+  const HAND = [
+    { name: 'Warm-up', tiles: map([[3, 8, '#SSS............GGG#']]),
+      enemies: [5, 7, 9, 11, 13, 15].map((c, i) => V(c, 3, 8, 4, i % 2 ? 0.5 : 0)), coins: [[10, 3]],
+      tip: 'Dodge the blue dots, grab the coin, reach the green goal' },
+    { name: 'Spinner', tiles: map([[2, 9, ROOM]]), enemies: O(10, 6, [1, 2, 3], 2, 1.6), coins: [[4, 2], [15, 9], [9, 5]] },
+    { name: 'Switchback', tiles: map([[2, 3, '#SS...............##'], [4, 5, '##############....##'], [6, 7, '##................##'], [8, 8, '##....##############'], [9, 9, '##GG..##############']]),
+      enemies: [...[5, 7, 9, 11, 13].map((c, i) => V(c, 2, 3, 1.5, i % 2 ? 0.5 : 0)), H(4, 14, 17, 3, 0), H(5, 14, 17, 3, 0.5),
+        ...[4, 6, 8, 10, 12].map((c, i) => V(c, 6, 7, 1.5, i % 2 ? 0 : 0.5)), H(8, 2, 5, 2.5, 0)],
       coins: [[17, 2], [2, 6], [5, 9]] },
-    { name: 'Halfway', map: map([[3, 8, SPLIT]]),
-      enemies: [...[3, 4, 5, 6, 7, 8].map((c, i) => V(c, 3, 8, 3, i * 0.08)), ...O(14, 6, [1, 2], 3, 2)],
-      coins: [[6, 8], [12, 3], [16, 8]] },
-    { name: 'Racetrack', map: map([[2, 9, ROOM]]),
-      enemies: [LOOP([[3, 2], [16, 2], [16, 9], [3, 9]], 8, 4.5), LOOP([[6, 4], [6, 7], [13, 7], [13, 4]], 6, 3)],
+    { name: 'Halfway', tiles: map([[3, 8, SPLIT]]), enemies: [...[3, 4, 5, 6, 7, 8].map((c, i) => V(c, 3, 8, 3, i * 0.08)), ...O(14, 6, [1, 2], 3, 2)],
+      coins: [[6, 8], [12, 3], [16, 8]], tip: 'The green strip in the middle is a checkpoint' },
+    { name: 'Racetrack', tiles: map([[2, 9, ROOM]]), enemies: [LOOP([[3, 2], [16, 2], [16, 9], [3, 9]], 8, 4.5), LOOP([[6, 4], [6, 7], [13, 7], [13, 4]], 6, 3)],
       coins: [[3, 2], [16, 9], [9, 5], [10, 6]] },
-    { name: 'The wave', map: map([[4, 6, ROOM]]),
-      enemies: [4, 6, 8, 10, 12, 14, 16].map((c, i) => V(c, 4, 6, 4, i * 0.12)),
-      coins: [[9, 4], [11, 6]] },
-    { name: 'Clockwork', map: map([[2, 9, SPLIT]]),
-      enemies: [...O(6, 6, [1, 2, 2.75], 2, 2.2), ...O(14, 6, [1, 2, 2.75], 3, -1.8)],
-      coins: [[3, 2], [8, 9], [11, 9], [16, 2]] },
-    { name: 'Crossfire', map: map([[2, 9, ROOM]]),
-      enemies: [H(4, 3, 16, 3.5, 0), H(4, 3, 16, 3.5, 0.5), H(7, 3, 16, 3.5, 0.25), H(7, 3, 16, 3.5, 0.75),
-        V(6, 2, 9, 3, 0), V(10, 2, 9, 3, 0.5), V(14, 2, 9, 3, 0.25)],
+    { name: 'The wave', tiles: map([[4, 6, ROOM]]), enemies: [4, 6, 8, 10, 12, 14, 16].map((c, i) => V(c, 4, 6, 4, i * 0.12)), coins: [[9, 4], [11, 6]] },
+    { name: 'Clockwork', tiles: map([[2, 9, SPLIT]]), enemies: [...O(6, 6, [1, 2, 2.75], 2, 2.2), ...O(14, 6, [1, 2, 2.75], 3, -1.8)], coins: [[3, 2], [8, 9], [11, 9], [16, 2]] },
+    { name: 'Crossfire', tiles: map([[2, 9, ROOM]]), enemies: [H(4, 3, 16, 3.5, 0), H(4, 3, 16, 3.5, 0.5), H(7, 3, 16, 3.5, 0.25), H(7, 3, 16, 3.5, 0.75), V(6, 2, 9, 3, 0), V(10, 2, 9, 3, 0.5), V(14, 2, 9, 3, 0.25)],
       coins: [[8, 2], [12, 9], [16, 5]] },
-    { name: 'Windmill', map: map([[2, 9, ROOM]]),
-      enemies: O(10, 6, [1, 1.75, 2.5, 3.25, 4], 4, 1.1),
-      coins: [[9, 2], [10, 9], [3, 2], [16, 9]] },
-    { name: 'Final exam', map: map([[2, 9, SPLIT]]),
-      enemies: [V(4, 2, 9, 5, 0), V(6, 2, 9, 5, 0.25), V(8, 2, 9, 5, 0.5), H(2, 3, 8, 3, 0), H(9, 3, 8, 3, 0.5),
-        ...O(14, 6, [1, 2, 2.75], 4, 2), LOOP([[11, 2], [16, 2], [16, 9], [11, 9]], 4, 4)],
+    { name: 'Windmill', tiles: map([[2, 9, ROOM]]), enemies: O(10, 6, [1, 1.75, 2.5, 3.25, 4], 4, 1.1), coins: [[9, 2], [10, 9], [3, 2], [16, 9]] },
+    { name: 'Final exam', tiles: map([[2, 9, SPLIT]]),
+      enemies: [V(4, 2, 9, 5, 0), V(6, 2, 9, 5, 0.25), V(8, 2, 9, 5, 0.5), H(2, 3, 8, 3, 0), H(9, 3, 8, 3, 0.5), ...O(14, 6, [1, 2, 2.75], 4, 2), LOOP([[11, 2], [16, 2], [16, 9], [11, 9]], 4, 4)],
       coins: [[3, 2], [8, 9], [13, 5], [16, 2]] }
   ];
+  const LEVELS = HAND.map((l) => blankLevel({ ...l, part: 1, features: ['patrol'] }));
 
-  // ---------- parts 2-10: built from patterns, harder every part ----------
-  const PARTS = [
-    { name: 'Basics',     a: '#f4f2ff', b: '#e8e4ff', wall: '#2d2766' },
-    { name: 'Spin cycle', a: '#effaf8', b: '#d9f1ec', wall: '#164e4a' },
-    { name: 'Rush hour',  a: '#fff8ea', b: '#f9eac6', wall: '#5a3a0e' },
-    { name: 'Tight fit',  a: '#fff1f4', b: '#f9dbe3', wall: '#5b1730' },
-    { name: 'Clockwork',  a: '#eef6ff', b: '#d7e8ff', wall: '#173b66' },
-    { name: 'Storm',      a: '#f5fbe9', b: '#e2f1c4', wall: '#2f4a12' },
-    { name: 'Overdrive',  a: '#fff3ea', b: '#ffdcc2', wall: '#6a2c0a' },
-    { name: 'Chaos',      a: '#f7efff', b: '#e6d5ff', wall: '#3d1a6b' },
-    { name: 'Nightmare',  a: '#eef0f4', b: '#d8dce5', wall: '#1f2430' },
-    { name: 'Impossible', a: '#3a2f57', b: '#32284c', wall: '#0b0816', dark: true }
-  ];
-  LEVELS.forEach((lv) => { lv.part = 1; });
-
+  // =====================================================================
+  // level generator for parts 2-10
+  // =====================================================================
   function makeRng(seed) {
     return () => {
       seed = (seed + 0x6d2b79f5) | 0;
@@ -230,130 +243,576 @@
       return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
     };
   }
-  const SWITCHBACK_MAP = LEVELS[2].map;
-
-  function buildLevel(part, idx) {
-    const rnd = makeRng(part * 1000 + idx * 37 + 7);
-    const R = {
+  const makeR = (seed) => {
+    const rnd = makeRng(seed);
+    return {
       f: (a, b) => a + (b - a) * rnd(),
       i: (a, b) => a + Math.floor(rnd() * (b - a + 1)),
       pick: (arr) => arr[Math.floor(rnd() * arr.length)],
+      chance: (p) => rnd() < p,
       shuffle: (arr) => { const a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
     };
-    // difficulty 0..1: each part starts clearly above the one before
-    const d = Math.min(1, ((part - 2) / 8) * 0.85 + (idx / 9) * 0.15);
+  };
+
+  const newGrid = (fill) => Array.from({ length: ROWS }, () => Array(COLS).fill(fill));
+  const fillR = (g, c1, r1, c2, r2, ch) => {
+    for (let r = Math.max(0, r1); r <= Math.min(ROWS - 1, r2); r++)
+      for (let c = Math.max(0, c1); c <= Math.min(COLS - 1, c2); c++) g[r][c] = ch;
+  };
+  const inB = (c, r) => c >= 0 && r >= 0 && c < COLS && r < ROWS;
+  const walk = (g, c, r) => inB(c, r) && g[r][c] !== '#';
+  const isZone = (ch) => ch === 'S' || ch === 'G' || ch === 'C';
+  const K = (c, r) => r * COLS + c;
+  const cellsWhere = (g, fn) => { const out = []; for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) if (fn(c, r, g[r][c])) out.push([c, r]); return out; };
+
+  function bfs(g, starts, blocked = () => false, pads = [], wantParent = false) {
+    const dist = new Array(COLS * ROWS).fill(-1);
+    const parent = wantParent ? new Array(COLS * ROWS).fill(-1) : null;
+    const padMap = new Map();
+    for (const p of pads) { padMap.set(K(...p.a), p.b); padMap.set(K(...p.b), p.a); }
+    const q = [];
+    for (const [c, r] of starts) { dist[K(c, r)] = 0; q.push([c, r]); }
+    for (let h = 0; h < q.length; h++) {
+      const [c, r] = q[h], d = dist[K(c, r)];
+      const nb = [[c + 1, r], [c - 1, r], [c, r + 1], [c, r - 1]];
+      const pm = padMap.get(K(c, r));
+      if (pm) nb.push(pm);
+      for (const [nc, nr] of nb) {
+        if (!walk(g, nc, nr) || blocked(nc, nr)) continue;
+        const k = K(nc, nr);
+        if (dist[k] >= 0) continue;
+        dist[k] = d + 1;
+        if (parent) parent[k] = K(c, r);
+        q.push([nc, nr]);
+      }
+    }
+    return wantParent ? { dist, parent } : dist;
+  }
+
+  // ---------- map shapes ----------
+  const LAYOUT_NAMES = {
+    pillars: 'Pillars', maze: 'Maze', snakeH: 'Zig-zag', snakeV: 'Up and down', rooms: 'Rooms',
+    ring: 'Ring road', plus: 'Crossroads', cave: 'Cave', stairs: 'Staircase', arena: 'Arena'
+  };
+  const LAYOUTS = {
+    pillars(R) {
+      const g = newGrid('#'); fillR(g, 1, 1, 18, 10, '.');
+      const n = R.i(7, 12);
+      for (let i = 0; i < n; i++) { const w = R.pick([1, 1, 2]), h = R.pick([1, 2, 2, 3]); const c = R.i(4, 16 - w), r = R.i(1, 11 - h); fillR(g, c, r, c + w - 1, r + h - 1, '#'); }
+      return g;
+    },
+    maze(R) {
+      const g = newGrid('#'), NI = 6, NJ = 3;
+      for (let i = 0; i < NI; i++) for (let j = 0; j < NJ; j++) fillR(g, 1 + 3 * i, 1 + 3 * j, 2 + 3 * i, 2 + 3 * j, '.');
+      const open = (i, j, a, b) => {
+        if (a !== i) { const lo = Math.min(i, a); fillR(g, 3 + 3 * lo, 1 + 3 * j, 3 + 3 * lo, 2 + 3 * j, '.'); }
+        else { const lo = Math.min(j, b); fillR(g, 1 + 3 * i, 3 + 3 * lo, 2 + 3 * i, 3 + 3 * lo, '.'); }
+      };
+      const seen = new Set(), s0 = [0, R.i(0, NJ - 1)], st = [s0];
+      seen.add(s0.join());
+      while (st.length) {
+        const [i, j] = st[st.length - 1];
+        const nb = R.shuffle([[i + 1, j], [i - 1, j], [i, j + 1], [i, j - 1]]).filter(([a, b]) => a >= 0 && b >= 0 && a < NI && b < NJ && !seen.has(a + ',' + b));
+        if (!nb.length) { st.pop(); continue; }
+        const [a, b] = nb[0]; seen.add(a + ',' + b); open(i, j, a, b); st.push([a, b]);
+      }
+      for (let i = 0; i < NI; i++) for (let j = 0; j < NJ; j++) {
+        if (i < NI - 1 && R.chance(0.3)) open(i, j, i + 1, j);
+        if (j < NJ - 1 && R.chance(0.3)) open(i, j, i, j + 1);
+      }
+      const js = R.i(0, NJ - 1), jg = R.i(0, NJ - 1);
+      fillR(g, 1, 1 + 3 * js, 2, 2 + 3 * js, 'S');
+      fillR(g, 16, 1 + 3 * jg, 17, 2 + 3 * jg, 'G');
+      return g;
+    },
+    snakeH(R) {
+      const g = newGrid('#'), hs = R.pick([[3, 2, 3], [2, 3, 3], [3, 3, 2]]), lanes = [];
+      let r = 1;
+      for (const h of hs) { lanes.push([r, r + h - 1]); fillR(g, 1, r, 18, r + h - 1, '.'); r += h + 1; }
+      for (let k = 0; k < lanes.length - 1; k++) { const wr = lanes[k][1] + 1; if (k % 2 === 0) fillR(g, 17, wr, 18, wr, '.'); else fillR(g, 1, wr, 2, wr, '.'); }
+      fillR(g, 1, lanes[0][0], 2, lanes[0][1], 'S');
+      fillR(g, 17, lanes[2][0], 18, lanes[2][1], 'G');
+      return g;
+    },
+    snakeV(R) {
+      const g = newGrid('#');
+      for (let k = 0; k < 6; k++) fillR(g, 1 + 3 * k, 1, 2 + 3 * k, 10, '.');
+      for (let k = 0; k < 5; k++) { const wc = 3 + 3 * k; if (k % 2 === 0) fillR(g, wc, 9, wc, 10, '.'); else fillR(g, wc, 1, wc, 2, '.'); }
+      fillR(g, 1, 1, 2, 2, 'S');
+      fillR(g, 16, 1, 17, 2, 'G');
+      return g;
+    },
+    rooms(R) {
+      const g = newGrid('#'), ws = R.pick([[5, 6, 5], [4, 6, 6], [6, 4, 6], [4, 3, 4, 4], [3, 4, 4, 4], [6, 6, 4]]), rs = [];
+      let c = 1;
+      for (const w of ws) { const top = R.i(1, 4), bot = R.i(7, 10); fillR(g, c, top, c + w - 1, bot, '.'); rs.push({ c1: c, c2: c + w - 1, top, bot }); c += w + 1; }
+      for (let k = 0; k < rs.length - 1; k++) {
+        const a = rs[k], b = rs[k + 1], lo = Math.max(a.top, b.top), hi = Math.min(a.bot, b.bot);
+        const r0 = R.i(lo, hi - 1); fillR(g, a.c2 + 1, r0, a.c2 + 1, r0 + 1, '.');
+      }
+      for (const rm of rs) if (rm.c2 - rm.c1 >= 4 && R.chance(0.6)) g[R.i(rm.top + 1, rm.bot - 1)][R.i(rm.c1 + 1, rm.c2 - 1)] = '#';
+      return g;
+    },
+    ring(R) {
+      const g = newGrid('#'); fillR(g, 1, 1, 18, 10, '.');
+      fillR(g, R.i(5, 6), R.i(3, 4), R.i(13, 14), R.i(7, 8), '#');
+      const n = R.i(1, 3);
+      for (let i = 0; i < n; i++) g[R.pick([1, 10])][R.i(4, 15)] = '#';
+      return g;
+    },
+    plus(R) {
+      const g = newGrid('#'), ht = R.i(3, 5), hh = R.i(3, 4), vw = R.i(2, 3);
+      fillR(g, 1, ht, 18, ht + hh - 1, '.');
+      const vc = R.i(6, 8); fillR(g, vc, 1, vc + vw - 1, 10, '.');
+      if (R.chance(0.6)) { const vc2 = R.i(12, 14); fillR(g, vc2, 1, vc2 + vw - 1, 10, '.'); }
+      return g;
+    },
+    cave(R) {
+      let g = newGrid('#');
+      for (let r = 1; r <= 10; r++) for (let c = 1; c <= 18; c++) g[r][c] = R.chance(0.44) ? '#' : '.';
+      for (let it = 0; it < 4; it++) {
+        const n = newGrid('#');
+        for (let r = 1; r <= 10; r++) for (let c = 1; c <= 18; c++) {
+          let w = 0;
+          for (let dr = -1; dr <= 1; dr++) for (let dc = -1; dc <= 1; dc++) if (!walk(g, c + dc, r + dr)) w++;
+          n[r][c] = w >= 5 ? '#' : '.';
+        }
+        g = n;
+      }
+      let r = R.i(2, 8);
+      for (let c = 1; c <= 18; c++) {
+        fillR(g, c, r, c, r + 1, '.');
+        if (R.chance(0.35)) r = Math.max(1, Math.min(9, r + R.pick([-1, 1])));
+        fillR(g, c, r, c, r + 1, '.');
+      }
+      return g;
+    },
+    stairs(R) {
+      const g = newGrid('#'), down = R.chance(0.5), h = R.i(3, 4);
+      for (let c = 1; c <= 18; c++) {
+        const t = Math.round(((c - 1) / 17) * (10 - h));
+        const top = 1 + (down ? t : (10 - h) - t);
+        fillR(g, c, top, c, top + h - 1, '.');
+      }
+      for (let i = 0; i < 4; i++) { const c = R.i(3, 15), r = R.i(1, 9); fillR(g, c, r, c + 1, r + 1, '.'); }
+      return g;
+    },
+    arena(R) {
+      const g = newGrid('#'); fillR(g, 1, 1, 18, 10, '.');
+      const step = R.pick([3, 4]), big = R.chance(0.4), oc = R.i(0, step - 1);
+      for (let c = 4 + oc; c <= 15; c += step) for (let r = 2 + R.i(0, 1); r <= 9; r += 3) { g[r][c] = '#'; if (big && c + 1 <= 15) g[r][c + 1] = '#'; }
+      return g;
+    }
+  };
+  const LAYOUT_KEYS = Object.keys(LAYOUTS);
+
+  // ---------- what each part is about ----------
+  const PLAN = {
+    2: { primary: () => ['bouncer'], pool: ['patrol', 'orbit', 'chaser', 'patrol', 'orbit'] },
+    3: { primary: () => ['keys'], pool: ['patrol', 'bouncer', 'orbit', 'chaser'] },
+    4: { primary: () => ['laser'], pool: ['patrol', 'bouncer', 'keys', 'orbit', 'chaser'] },
+    5: { primary: () => ['turret'], pool: ['patrol', 'laser', 'bouncer', 'keys', 'chaser'] },
+    6: { primary: () => ['spike'], pool: ['phase', 'turret', 'laser', 'bouncer', 'chaser', 'keys'] },
+    7: { primary: () => ['ice'], pool: ['patrol', 'turret', 'spike', 'bouncer', 'laser', 'orbit', 'chaser'] },
+    8: { primary: () => ['conveyor'], pool: ['patrol', 'turret', 'laser', 'spike', 'ice', 'bouncer'] },
+    9: { primary: (idx) => [idx % 2 ? 'gate' : 'portal'], pool: ['chaser', 'patrol', 'turret', 'laser', 'spike', 'bouncer'] },
+    10: { primary: () => [], pool: ['patrol', 'orbit', 'bouncer', 'chaser', 'turret', 'laser', 'spike', 'phase', 'ice', 'conveyor', 'keys', 'gate', 'portal'] }
+  };
+  const MODSETS = [['dark'], ['timer'], ['mirror'], ['dark', 'timer'], ['wind'], ['mirror', 'timer'], ['dark', 'wind'], ['timer', 'wind'], ['dark', 'mirror'], ['dark', 'timer', 'wind']];
+  const HAZARDS = ['patrol', 'orbit', 'bouncer', 'chaser', 'turret', 'laser', 'spike', 'phase'];
+
+  const SEED_SKIP = { '10-1': 1, '10-6': 1 };
+  function genLevel(part, idx) {
+    const pr = makeR(part * 131 + 5);
+    const layoutOrder = pr.shuffle(LAYOUT_KEYS);
+    const plan = PLAN[part];
+    const pool = pr.shuffle(plan.pool);
+    // difficulty 0..1: Part 2 already starts hard, every part steps up from the last
+    const d = Math.min(1, 0.15 + ((part - 2) / 8) * 0.73 + (idx / 9) * 0.12);
+    let features = [...plan.primary(idx), pool[idx % pool.length]];
+    if (part >= 6) features.push(pool[(idx + 2) % pool.length]);
+    let mods = [];
+    if (part === 8 && idx % 3 === 2) mods = ['wind'];
+    if (part === 10) { mods = MODSETS[idx]; features = [pool[(idx * 2) % pool.length], pool[(idx * 2 + 1) % pool.length]]; }
+    features = [...new Set(features)];
+    if (features.includes('keys') && features.includes('gate')) features = features.filter((f) => f !== 'gate');
+    const layout = layoutOrder[idx];
+    // a few seeds came out unbeatable when checked with a solver; these skip to the next seed
+    const skip = SEED_SKIP[`${part}-${idx + 1}`] || 0;
+    for (let attempt = skip; attempt < skip + 60; attempt++) {
+      const R = makeR(part * 100003 + idx * 7919 + attempt * 104729 + 17);
+      const lv = tryBuild(R, d, part, idx, layout, features, mods);
+      if (lv) return lv;
+    }
+    // should not happen; keep the game playable anyway
+    return blankLevel({ name: 'Bonus', part, tiles: map([[2, 9, ROOM]]), enemies: [5, 8, 11, 14].map((c, i) => V(c, 2, 9, 3 + d * 2, i * 0.25)), coins: [[9, 2], [10, 9]], features: ['patrol'] });
+  }
+
+  function tryBuild(R, d, part, idx, layout, features, mods) {
     const sp = (a, b) => (a + (b - a) * d) * R.f(0.94, 1.06);
-    const coinCount = 2 + Math.round(d * 3);
-    const pickCoins = (m, k) => {
-      const cells = [];
-      m.forEach((row, r) => [...row].forEach((ch, c) => { if (ch === '.') cells.push([c, r]); }));
+    let g = LAYOUTS[layout](R);
+    // small wall stubs so no two maps of the same shape come out identical
+    {
+      const stubs = R.i(2, 5);
+      for (let i = 0; i < stubs; i++) {
+        const c = R.i(4, 15), r = R.i(1, 10);
+        if (g[r][c] !== '.') continue;
+        const touchesWall = [[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dc, dr]) => !walk(g, c + dc, r + dr));
+        if (touchesWall) g[r][c] = '#';
+      }
+    }
+    const lv = blankLevel({ part, features: [...features], mods: {} });
+    const doorSet = new Set(), gateSet = new Set(), padSet = new Set(), taken = new Set();
+
+    // --- start and goal zones ---
+    const zoneAt = (ch, pickCol) => {
+      if (cellsWhere(g, (c, r, x) => x === ch).length) return;
+      const w = cellsWhere(g, (c, r, x) => x === '.');
+      if (!w.length) return;
+      const edge = pickCol(w.map((x) => x[0]));
+      const [, r0] = R.pick(w.filter((x) => x[0] === edge));
+      for (const [c, r] of w) if (Math.abs(c - edge) <= 1 && Math.abs(r - r0) <= 1) g[r][c] = ch;
+    };
+    zoneAt('S', (cs) => Math.min(...cs));
+    zoneAt('G', (cs) => Math.max(...cs));
+    const S = () => cellsWhere(g, (c, r, x) => x === 'S');
+    const Gc = () => cellsWhere(g, (c, r, x) => x === 'G');
+    if (!S().length || !Gc().length) return null;
+    const prune = () => {
+      const dist = bfs(g, S(), () => false, lv.pads);
+      for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) if (g[r][c] !== '#' && dist[K(c, r)] < 0) g[r][c] = '#';
+      return Gc().length > 0;
+    };
+    if (!prune()) return null;
+    const minSG = Math.min(...Gc().map(([c]) => c)) - Math.max(...S().map(([c]) => c));
+    if (minSG < 8) return null;
+
+    const free = (c, r) => walk(g, c, r) && !isZone(g[r][c]) && !doorSet.has(K(c, r)) && !gateSet.has(K(c, r)) && !padSet.has(K(c, r));
+    const distFromS = () => bfs(g, S(), () => false, lv.pads);
+
+    // --- portals: cut the map in two and link the halves ---
+    if (features.includes('portal')) {
+      let ok = false;
+      for (const X of R.shuffle([7, 8, 9, 10, 11, 12])) {
+        const g2 = g.map((row) => row.slice());
+        let hasZone = false;
+        for (let r = 0; r < ROWS; r++) { if (isZone(g2[r][X])) hasZone = true; g2[r][X] = '#'; }
+        if (hasZone) continue;
+        const dS = bfs(g2, S()), dG = bfs(g2, Gc());
+        if (Gc().some(([c, r]) => dS[K(c, r)] >= 0)) continue;
+        const A = cellsWhere(g2, (c, r, x) => x === '.' && dS[K(c, r)] >= 3);
+        const B = cellsWhere(g2, (c, r, x) => x === '.' && dG[K(c, r)] >= 2);
+        if (!A.length || !B.length) continue;
+        g = g2;
+        const a = R.pick(A), b = R.pick(B);
+        lv.pads.push({ a, b });
+        padSet.add(K(...a)); padSet.add(K(...b));
+        ok = true;
+        break;
+      }
+      if (!ok) return null;
+      if (!prune()) return null;
+    }
+
+    // --- checkpoint halfway along the route ---
+    {
+      const { dist, parent } = bfs(g, S(), () => false, lv.pads, true);
+      let best = null;
+      for (const [c, r] of Gc()) if (dist[K(c, r)] >= 0 && (!best || dist[K(c, r)] < dist[K(best[0], best[1])])) best = [c, r];
+      if (!best) return null;
+      const path = [];
+      for (let k = K(best[0], best[1]); k >= 0; k = parent[k]) path.push(k);
+      if (path.length >= 26) {
+        const mid = path[Math.floor(path.length / 2)], mc = mid % COLS, mr = Math.floor(mid / COLS);
+        for (let dr = -1; dr <= 1; dr++) for (let dc = -1; dc <= 1; dc++) {
+          const c = mc + dc, r = mr + dr;
+          if (walk(g, c, r) && g[r][c] === '.' && !padSet.has(K(c, r))) g[r][c] = 'C';
+        }
+      }
+    }
+
+    // --- a full column that blocks the way (used by doors and gates) ---
+    const cutColumns = (minGap, existing) => {
       const out = [];
-      for (const cell of R.shuffle(cells)) {
-        if (out.length >= k) break;
-        if (out.every(([c, r]) => Math.abs(c - cell[0]) + Math.abs(r - cell[1]) >= 3)) out.push(cell);
+      for (const X of R.shuffle([5, 6, 7, 8, 9, 10, 11, 12, 13, 14])) {
+        if (existing.some((e) => Math.abs(e.X - X) < minGap)) continue;
+        const cells = [];
+        let bad = false;
+        for (let r = 0; r < ROWS; r++) {
+          if (!walk(g, X, r)) continue;
+          if (isZone(g[r][X]) || padSet.has(K(X, r)) || doorSet.has(K(X, r))) { bad = true; break; }
+          cells.push([X, r]);
+        }
+        if (bad || !cells.length) continue;
+        const set = new Set(cells.map(([c, r]) => K(c, r)));
+        const dist = bfs(g, S(), (c, r) => set.has(K(c, r)), lv.pads);
+        if (Gc().some(([c, r]) => dist[K(c, r)] >= 0)) continue;
+        out.push({ X, cells, set });
       }
       return out;
     };
-    const everyOther = (from, to) => { const out = []; for (let c = from; c <= to; c += 2) out.push(c); return out; };
 
-    const T_ = {
-      columns() {
-        const top = R.pick([2, 3]), bot = top === 2 ? 9 : 8;
-        const m = map([[top, bot, ROOM]]);
-        const mode = R.pick(['alt', 'wave', 'rand']), k = R.f(0.06, 0.14), s = sp(2.6, 6.2);
-        const en = everyOther(R.pick([4, 5]), 16).map((c, i) => V(c, top, bot, s, mode === 'alt' ? (i % 2) * 0.5 : mode === 'wave' ? i * k : R.f(0, 1)));
-        if (d > 0.45) en.push(H(R.i(top + 2, bot - 2), 3, 16, sp(1.8, 4)));
-        if (d > 0.8) en.push(H(R.i(top + 1, bot - 1), 3, 16, sp(1.8, 4), 0.5));
-        return { name: 'Columns', map: m, enemies: en, coins: pickCoins(m, coinCount) };
-      },
-      spinner() {
-        const m = map([[2, 9, ROOM]]);
-        const n = R.pick(d > 0.6 ? [3, 4] : d > 0.3 ? [2, 3] : [2]);
-        const dir = R.pick([1, -1]);
-        const en = O(10, 6, d > 0.5 ? [1, 1.75, 2.5, 3.25] : [1, 2, 3], n, sp(1.3, 2.1) * dir, R.f(0, 6));
-        if (d > 0.4) en.push(...O(10, 6, [3.9], R.i(4, 6), -dir * sp(0.6, 1.2)));
-        return { name: 'Spinner', map: m, enemies: en, coins: pickCoins(m, coinCount) };
-      },
-      twin() {
-        const m = map([[2, 9, SPLIT]]);
-        const s = sp(1.5, 2.5);
-        const en = [...O(6, 6, [1, 2, 2.75], R.pick(d > 0.5 ? [2, 3] : [2]), s, R.f(0, 6)),
-          ...O(14, 6, [1, 2, 2.75], R.pick(d > 0.5 ? [3, 4] : [2, 3]), -s * R.f(0.8, 1), R.f(0, 6))];
-        return { name: 'Twin spin', map: m, enemies: en, coins: pickCoins(m, coinCount) };
-      },
-      racetrack() {
-        const m = map([[2, 9, ROOM]]);
-        const en = [LOOP([[3, 2], [16, 2], [16, 9], [3, 9]], 5 + Math.round(d * 4), sp(3, 6) * R.pick([1, -1])),
-          LOOP([[6, 4], [6, 7], [13, 7], [13, 4]], 3 + Math.round(d * 2), sp(2, 4.5))];
-        if (d > 0.55) en.push(LOOP([[8, 5], [11, 5], [11, 6], [8, 6]], 2, sp(1.5, 3)));
-        return { name: 'Racetrack', map: m, enemies: en, coins: pickCoins(m, coinCount) };
-      },
-      wave() {
-        const m = map([[4, 6, ROOM]]);
-        const k = R.f(0.08, 0.16), alt = rnd() < 0.3, s = sp(2.8, 5);
-        const en = everyOther(4, 16).map((c, i) => V(c, 4, 6, s, alt ? (i % 2) * 0.5 : i * k));
-        if (d > 0.5) en.push(H(5, 3, 16, sp(2, 3.5)));
-        return { name: 'The wave', map: m, enemies: en, coins: pickCoins(m, Math.min(coinCount, 3)) };
-      },
-      crossfire() {
-        const m = map([[2, 9, ROOM]]);
-        const en = [];
-        const sh = sp(2.3, 4.4), sv = sp(2.3, 4.4);
-        R.shuffle([3, 4, 5, 6, 7, 8]).slice(0, 2 + Math.round(d * 2)).forEach((r) => {
-          const o = R.f(0, 1);
-          en.push(H(r, 3, 16, sh * R.f(0.85, 1.1), o));
-          if (d > 0.5) en.push(H(r, 3, 16, sh, o + 0.5));
-        });
-        R.shuffle([5, 7, 9, 11, 13, 15]).slice(0, 2 + Math.round(d * 2)).forEach((c) => en.push(V(c, 2, 9, sv * R.f(0.85, 1.1), R.f(0, 1))));
-        return { name: 'Crossfire', map: m, enemies: en, coins: pickCoins(m, coinCount) };
-      },
-      windmill() {
-        const m = map([[2, 9, ROOM]]);
-        const en = O(10, 6, d > 0.3 ? [1, 1.75, 2.5, 3.25, 4] : [1, 1.75, 2.5, 3.25], R.pick(d > 0.5 ? [3, 4] : [2, 3]), sp(0.8, 1.5) * R.pick([1, -1]), R.f(0, 6));
-        return { name: 'Windmill', map: m, enemies: en, coins: pickCoins(m, coinCount) };
-      },
-      switchback() {
-        const m = SWITCHBACK_MAP;
-        const sv = sp(1.2, 2.1), sh = sp(2.5, 4);
-        const en = [
-          ...[5, 7, 9, 11, 13].map((c, i) => V(c, 2, 3, sv, (i % 2) * 0.5)),
-          H(4, 14, 17, sh, 0), H(5, 14, 17, sh, 0.5),
-          ...[4, 6, 8, 10, 12].map((c, i) => V(c, 6, 7, sv, ((i + 1) % 2) * 0.5)),
-          H(8, 2, 5, sp(2, 3.8))];
-        if (d > 0.6) en.push(V(16, 2, 3, sv, 0.25), V(14, 6, 7, sv, 0.75));
-        return { name: 'Switchback', map: m, enemies: en, coins: pickCoins(m, 3) };
-      },
-      boss() {
-        const m = map([[2, 9, SPLIT]]);
-        const en = [];
-        if (rnd() < 0.5) {
-          const s = sp(3, 6);
-          [4, 6, 8].forEach((c, i) => en.push(V(c, 2, 9, s, i * 0.25)));
-          if (d > 0.3) en.push(H(2, 3, 8, sp(2, 4)), H(9, 3, 8, sp(2, 4), 0.5));
-        } else {
-          const s = sp(2.5, 4);
-          [3, 4, 5, 6, 7, 8].forEach((c, i) => en.push(V(c, 2, 9, s, i * 0.08)));
+    // --- keys and doors ---
+    if (features.includes('keys')) {
+      const want = d > 0.35 ? 2 : 1;
+      const cols = [];
+      for (const cand of cutColumns(3, [])) { if (cols.length >= want) break; if (cols.every((e) => Math.abs(e.X - cand.X) >= 3)) cols.push(cand); }
+      if (!cols.length) return null;
+      const dAll = distFromS();
+      cols.sort((a, b) => Math.min(...a.cells.map(([c, r]) => dAll[K(c, r)])) - Math.min(...b.cells.map(([c, r]) => dAll[K(c, r)])));
+      let prevRegion = null;
+      for (let k = 0; k < cols.length; k++) {
+        const closed = new Set();
+        cols.slice(k).forEach((e) => e.set.forEach((x) => closed.add(x)));
+        const dist = bfs(g, S(), (c, r) => closed.has(K(c, r)), lv.pads);
+        let cands = cellsWhere(g, (c, r) => dist[K(c, r)] >= 3 && free(c, r) && !closed.has(K(c, r)) && !taken.has(K(c, r)));
+        if (prevRegion) { const fresh = cands.filter(([c, r]) => !prevRegion.has(K(c, r))); if (fresh.length) cands = fresh; }
+        if (!cands.length) return null;
+        cands.sort((a, b) => dist[K(b[0], b[1])] - dist[K(a[0], a[1])]);
+        const kc = R.pick(cands.slice(0, Math.max(1, Math.ceil(cands.length / 3))));
+        lv.keys.push({ c: kc[0], r: kc[1], color: k });
+        taken.add(K(...kc));
+        cols[k].cells.forEach(([c, r]) => { lv.doors.push({ c, r, color: k }); doorSet.add(K(c, r)); });
+        prevRegion = new Set(cellsWhere(g, (c, r) => dist[K(c, r)] >= 0).map(([c, r]) => K(c, r)));
+      }
+    }
+
+    // --- timed gate ---
+    if (features.includes('gate')) {
+      const cols = cutColumns(0, []);
+      if (!cols.length) return null;
+      const col = cols[0];
+      const dist = bfs(g, S(), (c, r) => col.set.has(K(c, r)), lv.pads);
+      const dGate = bfs(g, col.cells, () => false, lv.pads);
+      const cands = cellsWhere(g, (c, r) => dist[K(c, r)] >= 0 && free(c, r) && !col.set.has(K(c, r)) && !taken.has(K(c, r)) && dGate[K(c, r)] >= 4 && dGate[K(c, r)] <= 10);
+      if (!cands.length) return null;
+      const btn = R.pick(cands);
+      const dur = (dGate[K(...btn)] * T) / P_SPEED * sp(1.75, 1.3) + 0.9;
+      lv.gate = { btn, cells: col.cells, dur };
+      col.cells.forEach(([c, r]) => gateSet.add(K(c, r)));
+      taken.add(K(...btn));
+    }
+
+    // --- floor types ---
+    const runs = (vertical) => {
+      const out = [], A = vertical ? COLS : ROWS, B = vertical ? ROWS : COLS;
+      for (let a = 0; a < A; a++) {
+        let s = -1;
+        for (let b = 0; b <= B; b++) {
+          const c = vertical ? a : b, r = vertical ? b : a;
+          const ok = b < B && free(c, r);
+          if (ok && s < 0) s = b;
+          if (!ok && s >= 0) { if (b - s >= 2) out.push({ vertical, a, b1: s, b2: b - 1, len: b - s }); s = -1; }
         }
-        en.push(...O(14, 6, [1, 2, 2.75], R.pick(d > 0.5 ? [3, 4] : [2, 3]), sp(1.5, 2.4) * R.pick([1, -1]), R.f(0, 6)));
-        if (d > 0.5) en.push(LOOP([[11, 2], [16, 2], [16, 9], [11, 9]], 3 + Math.round(d), sp(3, 5)));
-        return { name: 'Boss', map: m, enemies: en, coins: pickCoins(m, coinCount + 1) };
+      }
+      return out;
+    };
+    const sideLane = (run) => {
+      const chk = (off) => { for (let b = run.b1; b <= run.b2; b++) { const c = run.vertical ? run.a + off : b, r = run.vertical ? b : run.a + off; if (!walk(g, c, r)) return false; } return true; };
+      return chk(-1) || chk(1);
+    };
+    if (features.includes('ice')) {
+      if (R.chance(0.4)) { for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) if (g[r][c] === '.') g[r][c] = 'I'; }
+      else {
+        const n = R.i(3, 5);
+        for (let i = 0; i < n; i++) { const w = R.i(3, 7), h = R.i(2, 5), c0 = R.i(2, 18 - w), r0 = R.i(1, 11 - h); for (let r = r0; r < r0 + h; r++) for (let c = c0; c < c0 + w; c++) if (g[r][c] === '.') g[r][c] = 'I'; }
+      }
+    }
+    if (features.includes('conveyor')) {
+      const k = 3 + Math.round(d * 3), usedA = new Set();
+      for (const run of R.shuffle([...runs(true), ...runs(false)]).filter((x) => x.len >= 3)) {
+        if (usedA.size >= k) break;
+        const tag = (run.vertical ? 'v' : 'h') + run.a;
+        if (usedA.has(tag)) continue;
+        usedA.add(tag);
+        const ch = run.vertical ? R.pick(['^', 'v']) : R.pick(['<', '>']);
+        for (let b = run.b1; b <= run.b2; b++) { const c = run.vertical ? run.a : b, r = run.vertical ? b : run.a; if (g[r][c] === '.' || g[r][c] === 'I') g[r][c] = ch; }
+      }
+    }
+
+    // --- coins ---
+    {
+      const want = 2 + Math.round(d * 3);
+      const dS = distFromS();
+      const cands = R.shuffle(cellsWhere(g, (c, r) => free(c, r) && !taken.has(K(c, r)) && dS[K(c, r)] >= 2));
+      for (const cell of cands) {
+        if (lv.coins.length >= want) break;
+        if (lv.coins.every(([c, r]) => Math.abs(c - cell[0]) + Math.abs(r - cell[1]) >= 3)) { lv.coins.push(cell); taken.add(K(...cell)); }
+      }
+      if (lv.coins.length < 2) return null;
+    }
+
+    // --- hazards ---
+    const usedV = new Set(), usedH = new Set();
+    const lineFree = (run) => { const used = run.vertical ? usedV : usedH; return ![run.a - 1, run.a, run.a + 1].some((a) => used.has(a)); };
+    const claim = (run) => (run.vertical ? usedV : usedH).add(run.a);
+    // the first hazard in the list is the main one and gets the most copies
+    const mainHazard = features.find((f) => HAZARDS.includes(f));
+    const countFor = (f) => (f === mainHazard ? 3 + Math.round(d * 3) : 2 + Math.round(d * 2));
+    const dS = distFromS();
+
+    const place = {
+      patrol(k, phase) {
+        let n = 0;
+        for (const run of R.shuffle([...runs(true), ...runs(false)]).filter((x) => x.len <= 10 && sideLane(x))) {
+          if (n >= k) break;
+          if (!lineFree(run)) continue;
+          claim(run);
+          const p = run.vertical ? [[run.a + 0.5, run.b1 + 0.5], [run.a + 0.5, run.b2 + 0.5]] : [[run.b1 + 0.5, run.a + 0.5], [run.b2 + 0.5, run.a + 0.5]];
+          const e = { p, s: sp(2.4, 5), o: R.f(0, 1) };
+          if (phase) e.phase = { period: sp(2.6, 1.8), on: 0.6, ph: R.f(0, 1) };
+          lv.enemies.push(e);
+          n++;
+        }
+        return n;
+      },
+      phase(k) { return place.patrol(k, true); },
+      orbit(k) {
+        let n = 0;
+        for (const size of [7, 5]) {
+          const h = (size - 1) / 2;
+          const cands = R.shuffle(cellsWhere(g, (c, r) => {
+            for (let dr = -h; dr <= h; dr++) for (let dc = -h; dc <= h; dc++) if (!free(c + dc, r + dr)) return false;
+            return true;
+          }));
+          for (const [c, r] of cands) {
+            if (n >= Math.max(1, Math.min(2, k - 1))) break;
+            if (lv.enemies.some((e) => e.orbit && Math.abs(e.orbit[0] - (c + 0.5)) + Math.abs(e.orbit[1] - (r + 0.5)) < size)) continue;
+            lv.enemies.push(...O(c + 0.5, r + 0.5, size === 7 ? [1, 2, 3] : [1, 2], R.pick(d > 0.5 ? [2, 3] : [2]), sp(1.3, 2.2) * R.pick([1, -1]), R.f(0, 6)));
+            n++;
+          }
+        }
+        return n;
+      },
+      bouncer(k) {
+        const cands = R.shuffle(cellsWhere(g, (c, r) => free(c, r) && dS[K(c, r)] >= 5));
+        let n = 0;
+        for (const [c, r] of cands) {
+          if (n >= k) break;
+          const a = (R.pick([45, 135, 225, 315]) + R.f(-12, 12)) * Math.PI / 180;
+          lv.bouncers.push({ x: c + 0.5, y: r + 0.5, dx: Math.cos(a), dy: Math.sin(a), s: sp(2.4, 4.2) });
+          n++;
+        }
+        return n;
+      },
+      chaser(k) {
+        const maxD = Math.max(...dS);
+        const cands = R.shuffle(cellsWhere(g, (c, r) => free(c, r) && dS[K(c, r)] >= Math.max(8, maxD * 0.45)));
+        let n = 0;
+        for (const [c, r] of cands) {
+          if (n >= Math.min(3, k - 1 || 1)) break;
+          if (lv.chasers.some((ch) => Math.abs(ch.x - c) + Math.abs(ch.y - r) < 4)) continue;
+          lv.chasers.push({ x: c + 0.5, y: r + 0.5, s: (sp(0.45, 0.66) * P_SPEED) / T, aggro: 6 });
+          n++;
+        }
+        return n;
+      },
+      turret(k) {
+        const cands = [];
+        for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
+          if (g[r][c] !== '#') continue;
+          for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+            let L = 0;
+            while (free(c + dx * (L + 1), r + dy * (L + 1))) L++;
+            if (L < 2) continue;
+            const run = dx ? { vertical: false, a: r, b1: Math.min(c + dx, c + dx * L), b2: Math.max(c + dx, c + dx * L), len: L } : { vertical: true, a: c, b1: Math.min(r + dy, r + dy * L), b2: Math.max(r + dy, r + dy * L), len: L };
+            if (L >= 5 && !sideLane(run)) continue;
+            cands.push({ c, r, dx, dy, run });
+          }
+        }
+        let n = 0;
+        for (const t of R.shuffle(cands)) {
+          if (n >= k) break;
+          if (!lineFree(t.run)) continue;
+          claim(t.run);
+          lv.turrets.push({ c: t.c, r: t.r, dx: t.dx, dy: t.dy, every: sp(2.2, 1.25), speed: sp(3.5, 6), ph: R.f(0, 1) });
+          n++;
+        }
+        return n;
+      },
+      laser(k) {
+        let n = 0;
+        for (const run of R.shuffle([...runs(true), ...runs(false)]).filter((x) => x.len >= 2 && x.len <= 8)) {
+          if (n >= k) break;
+          if (!lineFree(run)) continue;
+          claim(run);
+          lv.lasers.push({ vertical: run.vertical, a: run.a, b1: run.b1, b2: run.b2, period: sp(2.8, 2.0), on: sp(0.38, 0.5), ph: R.f(0, 1) });
+          n++;
+        }
+        return n;
+      },
+      spike(k) {
+        let n = 0;
+        const have = new Set(lv.spikes.map((s) => K(s.c, s.r)));
+        const starts = R.shuffle(cellsWhere(g, (c, r) => free(c, r) && dS[K(c, r)] >= 3));
+        for (const [c0, r0] of starts) {
+          if (n >= k + 1) break;
+          const [w, h] = R.pick([[1, 3], [3, 1], [2, 2], [3, 3], [1, 2], [2, 1], [2, 3]]);
+          const ph = R.f(0, 1), period = sp(2.5, 1.7);
+          let added = 0;
+          for (let r = r0; r < r0 + h; r++) for (let c = c0; c < c0 + w; c++) {
+            if (!free(c, r) || have.has(K(c, r)) || dS[K(c, r)] < 2) continue;
+            lv.spikes.push({ c, r, ph, period }); have.add(K(c, r)); added++;
+          }
+          if (added) n++;
+        }
+        return n;
       }
     };
 
-    // the template order is fixed per part so each part uses every pattern once
-    const pr = makeRng(part * 7919);
-    const order = ['columns', 'spinner', 'twin', 'racetrack', 'wave', 'crossfire', 'windmill', 'switchback', ['columns', 'spinner', 'crossfire'][Math.floor(pr() * 3)]];
-    for (let i = order.length - 1; i > 0; i--) { const j = Math.floor(pr() * (i + 1)); [order[i], order[j]] = [order[j], order[i]]; }
-    const key = idx === 9 ? 'boss' : order[idx];
-    const lv = T_[key]();
-    lv.part = part;
+    let hazardCount = 0;
+    for (const f of features) {
+      if (!place[f]) continue;
+      let n = place[f](countFor(f));
+      // no room for this hazard on this map: use crossing patrols instead
+      if (n === 0 && f !== features[0]) n = place.patrol(countFor(f));
+      hazardCount += n;
+    }
+    if (features.some((f) => place[f]) && features[0] && place[features[0]] && hazardCount === 0) return null;
+    if (hazardCount < 3) hazardCount += place.patrol(3 - hazardCount + Math.round(d * 2));
+    if (hazardCount < 2) return null;
+
+    // --- modifiers ---
+    for (const m of mods) {
+      if (m === 'dark') lv.mods.dark = sp(125, 90);
+      if (m === 'mirror') lv.mods.mirror = true;
+      if (m === 'wind') lv.mods.wind = sp(40, 65);
+      if (m === 'timer') {
+        const targets = [...lv.coins, ...lv.keys.map((k) => [k.c, k.r])];
+        if (lv.gate) targets.push(lv.gate.btn);
+        let cur = S(), total = 0;
+        const left = targets.slice();
+        while (left.length) {
+          const dist = bfs(g, cur, () => false, lv.pads);
+          left.sort((a, b) => dist[K(...a)] - dist[K(...b)]);
+          const nx = left.shift();
+          total += Math.max(0, dist[K(...nx)]);
+          cur = [nx];
+        }
+        const dist = bfs(g, cur, () => false, lv.pads);
+        total += Math.min(...Gc().map(([c, r]) => (dist[K(c, r)] < 0 ? 999 : dist[K(c, r)])));
+        lv.mods.timer = Math.ceil((total * T) / P_SPEED * sp(2.8, 2.0) + 6);
+      }
+    }
+    lv.features.push(...mods);
+
+    // final check: goal reachable with everything open
+    const dEnd = bfs(g, S(), () => false, lv.pads);
+    if (!Gc().some(([c, r]) => dEnd[K(c, r)] >= 0)) return null;
+
+    lv.tiles = g.map((row) => row.join(''));
+    const headline = part === 10 ? mods.map((m) => FEATURE_NAMES[m]).join(' + ') : FEATURE_NAMES[features[0]];
+    lv.name = `${LAYOUT_NAMES[layout]} · ${headline}`;
+    lv.tip = [...mods, ...features].slice(0, 2).map((f) => FEATURE_TIPS[f]).filter(Boolean).join(' · ');
     return lv;
   }
-  for (let p = 2; p <= 10; p++) for (let i = 0; i < 10; i++) LEVELS.push(buildLevel(p, i));
-  const partOf = (i) => Math.floor(i / 10) + 1;
-  const theme = () => PARTS[(L ? L.part : 1) - 1];
 
-  // ---------- canvas sizing ----------
+  for (let p = 2; p <= 10; p++) for (let i = 0; i < 10; i++) LEVELS.push(genLevel(p, i));
+  const partOf = (i) => Math.floor(i / 10) + 1;
+
+  // =====================================================================
+  // canvas sizing
+  // =====================================================================
   const game = document.getElementById('game');
   const cv = document.getElementById('cv');
   const ctx = cv.getContext('2d');
@@ -373,100 +832,137 @@
   window.addEventListener('resize', fit);
   fit();
 
-  // ---------- storage ----------
+  // =====================================================================
+  // storage (part 1 progress carries over from the older version)
+  // =====================================================================
   const store = {
     get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
     set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
   };
-  let unlocked = store.get('needle-unlocked', 1);
-  let bests = store.get('needle-bests', {});
+  let unlocked = store.get('nr3-unlocked', null);
+  let bests = store.get('nr3-bests', null);
+  if (unlocked === null) {
+    const oldBests = store.get('needle-bests', {});
+    bests = {};
+    for (let i = 0; i < 10; i++) if (oldBests[i] !== undefined) bests[i] = oldBests[i];
+    unlocked = Math.min(store.get('needle-unlocked', 1), 11);
+    store.set('nr3-unlocked', unlocked); store.set('nr3-bests', bests);
+  }
   Object.keys(bests).forEach((k) => { unlocked = Math.max(unlocked, Math.min(Number(k) + 2, LEVELS.length)); });
+  store.set('nr3-unlocked', unlocked);
   let muted = store.get('needle-muted', false);
 
-  // ---------- sound ----------
+  // =====================================================================
+  // sound
+  // =====================================================================
   let ac = null;
   function tone(freq, dur, type = 'square', vol = 0.05, slideTo = null, delay = 0) {
     if (muted) return;
     try {
       if (!ac) ac = new (window.AudioContext || window.webkitAudioContext)();
       if (ac.state === 'suspended') ac.resume();
-      const t = ac.currentTime + delay, o = ac.createOscillator(), g = ac.createGain();
+      const t = ac.currentTime + delay, o = ac.createOscillator(), gn = ac.createGain();
       o.type = type; o.frequency.setValueAtTime(freq, t);
       if (slideTo) o.frequency.exponentialRampToValueAtTime(slideTo, t + dur);
-      g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-      o.connect(g).connect(ac.destination); o.start(t); o.stop(t + dur + 0.02);
+      gn.gain.setValueAtTime(vol, t); gn.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      o.connect(gn).connect(ac.destination); o.start(t); o.stop(t + dur + 0.02);
     } catch (e) {}
   }
   const sfx = {
     coin() { tone(1046, 0.07); tone(1568, 0.1, 'square', 0.05, null, 0.05); },
+    key() { [784, 988, 1175].forEach((f, i) => tone(f, 0.09, 'triangle', 0.06, null, i * 0.05)); },
     die() { tone(300, 0.25, 'sawtooth', 0.06, 60); },
     check() { tone(660, 0.08, 'triangle', 0.06); tone(880, 0.12, 'triangle', 0.06, null, 0.08); },
     win() { [523, 659, 784, 1047, 1319].forEach((f, i) => tone(f, 0.12, 'square', 0.045, null, i * 0.07)); },
-    locked() { tone(180, 0.12, 'square', 0.04); }
+    locked() { tone(180, 0.12, 'square', 0.04); },
+    zap() { tone(1400, 0.15, 'sawtooth', 0.03, 300); },
+    button() { tone(440, 0.08, 'square', 0.05); tone(660, 0.08, 'square', 0.05, null, 0.06); },
+    shoot() { tone(520, 0.05, 'square', 0.015, 260); }
   };
 
-  // ---------- level state ----------
+  // =====================================================================
+  // runtime state
+  // =====================================================================
   let state = 'menu';
-  let L, levelIndex = 0, tiles, enemies, coins, spawn, player, time, deaths, dying, particles = [], lockedBuzz = 0;
+  let L, levelIndex = 0, grid, doorMap, keysRT, gateRT, padsRT, enemies, bouncers, chasers, turrets, bullets, coins;
+  let spawn, player, time, deaths, dying, particles = [], timeLeft, wind, onPad, toast, lockedBuzz = 0;
 
   function buildEnemy(def) {
     const out = [];
     if (def.orbit) {
       for (let k = 0; k < def.n; k++) out.push({ kind: 'orbit', cx: def.orbit[0], cy: def.orbit[1], r: def.r, s: def.s, a: def.a + (k * Math.PI * 2) / def.n });
-    } else {
-      const pts = def.loop ? [...def.p, def.p[0]] : def.p;
-      const segs = [];
-      let len = 0;
-      for (let i = 0; i < pts.length - 1; i++) {
-        const [x1, y1] = pts[i], [x2, y2] = pts[i + 1];
-        const l = Math.hypot(x2 - x1, y2 - y1);
-        segs.push({ x1, y1, x2, y2, l, start: len });
-        len += l;
-      }
-      const n = def.n || 1;
-      for (let k = 0; k < n; k++) out.push({ kind: 'path', segs, len, loop: !!def.loop, s: def.s, o: (def.o || 0) + k / n });
+      return out;
     }
+    const pts = def.loop ? [...def.p, def.p[0]] : def.p;
+    const segs = [];
+    let len = 0;
+    for (let i = 0; i < pts.length - 1; i++) {
+      const [x1, y1] = pts[i], [x2, y2] = pts[i + 1], l = Math.hypot(x2 - x1, y2 - y1);
+      segs.push({ x1, y1, x2, y2, l, start: len }); len += l;
+    }
+    const n = def.n || 1;
+    for (let k = 0; k < n; k++) out.push({ kind: 'path', segs, len, loop: !!def.loop, s: def.s, o: (def.o || 0) + k / n, phase: def.phase });
     return out;
   }
   function enemyPos(e, t) {
     if (e.kind === 'orbit') { const a = e.a + e.s * t; return [e.cx + Math.cos(a) * e.r, e.cy + Math.sin(a) * e.r]; }
-    let d;
-    if (e.loop) d = (((e.o * e.len + e.s * t) % e.len) + e.len) % e.len;
-    else { const P = e.len * 2; const q = (((e.o * P + e.s * t) % P) + P) % P; d = q <= e.len ? q : P - q; }
+    let dd;
+    if (e.loop) dd = (((e.o * e.len + e.s * t) % e.len) + e.len) % e.len;
+    else { const P = e.len * 2, q = (((e.o * P + e.s * t) % P) + P) % P; dd = q <= e.len ? q : P - q; }
     for (const sg of e.segs) {
-      if (d <= sg.start + sg.l || sg === e.segs[e.segs.length - 1]) {
-        const f = sg.l ? Math.min(1, (d - sg.start) / sg.l) : 0;
+      if (dd <= sg.start + sg.l || sg === e.segs[e.segs.length - 1]) {
+        const f = sg.l ? Math.min(1, (dd - sg.start) / sg.l) : 0;
         return [sg.x1 + (sg.x2 - sg.x1) * f, sg.y1 + (sg.y2 - sg.y1) * f];
       }
     }
     return [0, 0];
   }
-  function centroid(ch) {
+  const cycle = (period, ph, t) => (((t / period + ph) % 1) + 1) % 1;
+  const phaseOn = (e, t) => !e.phase || cycle(e.phase.period, e.phase.ph, t) < e.phase.on;
+
+  function centroidOf(ch) {
     let sx = 0, sy = 0, n = 0;
-    tiles.forEach((row, r) => [...row].forEach((c, col) => { if (c === ch) { sx += col + 0.5; sy += r + 0.5; n++; } }));
+    for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) if (grid[r][c] === ch) { sx += c + 0.5; sy += r + 0.5; n++; }
     return n ? { x: (sx / n) * T, y: (sy / n) * T } : null;
   }
-  function loadLevel(i) {
+
+  function setupLevel(i) {
     levelIndex = i;
     L = LEVELS[i];
-    tiles = L.map;
+    grid = L.tiles.map((row) => row.split(''));
+    doorMap = new Map(L.doors.map((dr) => [K(dr.c, dr.r), { color: dr.color, open: false }]));
+    keysRT = L.keys.map((k) => ({ ...k, got: false }));
+    gateRT = L.gate ? { btn: L.gate.btn, cells: new Set(L.gate.cells.map(([c, r]) => K(c, r))), list: L.gate.cells, dur: L.gate.dur, t: 0 } : null;
+    padsRT = L.pads;
     enemies = L.enemies.flatMap(buildEnemy);
+    bouncers = L.bouncers.map((b) => ({ ...b, x0: b.x, y0: b.y, dx0: b.dx, dy0: b.dy }));
+    chasers = L.chasers.map((ch) => ({ ...ch, hx: ch.x, hy: ch.y }));
+    turrets = L.turrets.map((tr) => ({ ...tr, last: Math.floor(tr.ph) }));
+    bullets = [];
     coins = L.coins.map(([c, r]) => ({ x: (c + 0.5) * T, y: (r + 0.5) * T, state: 'free' }));
-    spawn = centroid('S');
-    player = { x: spawn.x, y: spawn.y, face: [1, 0] };
-    time = 0; deaths = 0; dying = 0; particles = [];
+    spawn = centroidOf('S');
+    player = { x: spawn.x, y: spawn.y, vx: 0, vy: 0, face: [1, 0] };
+    time = 0; deaths = 0; dying = 0; particles = []; onPad = true;
+    timeLeft = L.mods.timer || 0;
+    wind = { dir: [1, 0], t: 3.5 };
+    toast = { text: L.tip || '', t: L.tip ? 4.5 : 0 };
+  }
+  function loadLevel(i) {
+    setupLevel(i);
     state = 'play';
     $('ov-menu').hidden = true;
     $('ov-clear').hidden = true;
   }
 
-  // ---------- input ----------
+  // =====================================================================
+  // input
+  // =====================================================================
   const keys = new Set();
   window.addEventListener('keydown', (e) => {
     const k = e.key.toLowerCase();
     if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', ' '].includes(k)) e.preventDefault();
     keys.add(k);
-    if (k === 'r' && state === 'play') restartLevel();
+    if (k === 'r' && state === 'play') loadLevel(levelIndex);
     if (k === 'escape') openMenu();
     if (k === 'enter' && state === 'clear') $('b-next').click();
   });
@@ -480,10 +976,7 @@
     cv.setPointerCapture(e.pointerId);
     stick = { ox: e.clientX, oy: e.clientY, dx: 0, dy: 0 };
   });
-  cv.addEventListener('pointermove', (e) => {
-    if (!stick) return;
-    stick.dx = e.clientX - stick.ox; stick.dy = e.clientY - stick.oy;
-  });
+  cv.addEventListener('pointermove', (e) => { if (stick) { stick.dx = e.clientX - stick.ox; stick.dy = e.clientY - stick.oy; } });
   const endStick = () => { stick = null; };
   cv.addEventListener('pointerup', endStick);
   cv.addEventListener('pointercancel', endStick);
@@ -499,38 +992,48 @@
       if (m > 6) { const f = Math.min(1, m / 40); x = (stick.dx / scale / m) * f; y = (stick.dy / scale / m) * f; }
     }
     const m = Math.hypot(x, y);
-    return m > 1 ? [x / m, y / m] : [x, y];
+    if (m > 1) { x /= m; y /= m; }
+    if (L.mods.mirror) x = -x;
+    return [x, y];
   }
 
-  // ---------- physics ----------
-  const tileAt = (c, r) => (r < 0 || r >= ROWS || c < 0 || c >= COLS ? '#' : tiles[r][c]);
-  function blocked(x, y) {
-    const h = P_SIZE / 2;
+  // =====================================================================
+  // world queries
+  // =====================================================================
+  const tileAt = (c, r) => (inB(c, r) ? grid[r][c] : '#');
+  const doorClosed = (c, r) => { const dr = doorMap.get(K(c, r)); return !!dr && !dr.open; };
+  const gateClosed = (c, r) => !!gateRT && gateRT.t <= 0 && gateRT.cells.has(K(c, r));
+  const playerSolid = (c, r) => tileAt(c, r) === '#' || doorClosed(c, r) || gateClosed(c, r);
+  const enemySolid = (c, r) => playerSolid(c, r) || isZone(tileAt(c, r));
+
+  function boxHits(x, y, h, solidFn) {
     const c1 = Math.floor((x - h) / T), c2 = Math.floor((x + h - 0.01) / T);
     const r1 = Math.floor((y - h) / T), r2 = Math.floor((y + h - 0.01) / T);
-    for (let r = r1; r <= r2; r++) for (let c = c1; c <= c2; c++) if (tileAt(c, r) === '#') return true;
+    for (let r = r1; r <= r2; r++) for (let c = c1; c <= c2; c++) if (solidFn(c, r)) return true;
     return false;
   }
-  function moveAxis(dx, dy) {
+  function moveBox(obj, dx, dy, h, solidFn) {
     const steps = Math.ceil(Math.max(Math.abs(dx), Math.abs(dy)) / 2) || 1;
     for (let i = 0; i < steps; i++) {
-      const nx = player.x + dx / steps, ny = player.y + dy / steps;
-      if (blocked(nx, ny)) return;
-      player.x = nx; player.y = ny;
+      const nx = obj.x + dx / steps, ny = obj.y + dy / steps;
+      if (boxHits(nx, ny, h, solidFn)) return true;
+      obj.x = nx; obj.y = ny;
     }
+    return false;
   }
-  function touchesEnemy(ex, ey) {
+  function circleHitsPlayer(x, y, r) {
     const h = P_SIZE / 2 - 1;
-    const cx = Math.max(player.x - h, Math.min(ex, player.x + h));
-    const cy = Math.max(player.y - h, Math.min(ey, player.y + h));
-    return (ex - cx) ** 2 + (ey - cy) ** 2 < E_R * E_R;
-  }
-  function overlapsCircle(x, y, r) {
-    const h = P_SIZE / 2;
     const cx = Math.max(player.x - h, Math.min(x, player.x + h));
     const cy = Math.max(player.y - h, Math.min(y, player.y + h));
     return (x - cx) ** 2 + (y - cy) ** 2 < r * r;
   }
+  function rectHitsPlayer(x, y, w, h) {
+    const p = P_SIZE / 2 - 2;
+    return player.x + p > x && player.x - p < x + w && player.y + p > y && player.y - p < y + h;
+  }
+  const laserRect = (lz) => lz.vertical
+    ? [lz.a * T + T / 2 - 3, lz.b1 * T, 6, (lz.b2 - lz.b1 + 1) * T]
+    : [lz.b1 * T, lz.a * T + T / 2 - 3, (lz.b2 - lz.b1 + 1) * T, 6];
 
   function burst(x, y, color, n) {
     if (reduced) n = Math.ceil(n / 3);
@@ -547,45 +1050,151 @@
     burst(player.x, player.y, '#ff3b4a', 26);
     coins.forEach((c) => { if (c.state === 'held') c.state = 'free'; });
   }
-  function restartLevel() { loadLevel(levelIndex); }
+  function respawn() {
+    player.x = spawn.x; player.y = spawn.y; player.vx = 0; player.vy = 0;
+    bullets = [];
+    chasers.forEach((ch) => { ch.x = ch.hx; ch.y = ch.hy; });
+    if (gateRT) gateRT.t = 0;
+    timeLeft = L.mods.timer || 0;
+    onPad = true;
+  }
 
+  // =====================================================================
+  // update
+  // =====================================================================
   function update(dt) {
     for (let i = particles.length - 1; i >= 0; i--) {
       const p = particles[i];
       p.life += dt; p.x += p.vx * dt; p.y += p.vy * dt; p.vx *= 0.9; p.vy *= 0.9;
       if (p.life >= p.max) particles.splice(i, 1);
     }
+    if (state === 'menu') { time += dt; updateMovers(dt); return; }
     if (state !== 'play') return;
     time += dt;
+    if (toast.t > 0) toast.t -= dt;
     if (lockedBuzz > 0) lockedBuzz -= dt;
+    updateMovers(dt);
 
-    if (dying > 0) {
-      dying -= dt;
-      if (dying <= 0) { player.x = spawn.x; player.y = spawn.y; }
-      return;
+    if (dying > 0) { dying -= dt; if (dying <= 0) respawn(); return; }
+
+    // player movement
+    const [ix, iy] = inputDir();
+    if (ix || iy) player.face = [ix, iy];
+    const under = tileAt(Math.floor(player.x / T), Math.floor(player.y / T));
+    if (under === 'I') {
+      const k = Math.min(1, dt * 1.7);
+      player.vx += (ix * P_SPEED - player.vx) * k;
+      player.vy += (iy * P_SPEED - player.vy) * k;
+    } else { player.vx = ix * P_SPEED; player.vy = iy * P_SPEED; }
+    let px = 0, py = 0;
+    if (DIRS[under]) { px += DIRS[under][0] * CONVEYOR_PUSH; py += DIRS[under][1] * CONVEYOR_PUSH; }
+    if (L.mods.wind && !isZone(under)) {
+      wind.t -= dt;
+      if (wind.t <= 0) { wind.t = 3.5; const opts = [[1, 0], [-1, 0], [0, 1], [0, -1]].filter((v) => v[0] !== wind.dir[0] || v[1] !== wind.dir[1]); wind.dir = opts[Math.floor(Math.random() * opts.length)]; }
+      px += wind.dir[0] * L.mods.wind; py += wind.dir[1] * L.mods.wind;
+    }
+    if (moveBox(player, (player.vx + px) * dt, 0, P_SIZE / 2, playerSolid)) player.vx = 0;
+    if (moveBox(player, 0, (player.vy + py) * dt, P_SIZE / 2, playerSolid)) player.vy = 0;
+
+    const pc = Math.floor(player.x / T), pr = Math.floor(player.y / T), here = tileAt(pc, pr);
+
+    // portals
+    const pad = padsRT.find((p) => (p.a[0] === pc && p.a[1] === pr) || (p.b[0] === pc && p.b[1] === pr));
+    if (pad && !onPad) {
+      const to = pad.a[0] === pc && pad.a[1] === pr ? pad.b : pad.a;
+      burst(player.x, player.y, '#a855f7', 14);
+      player.x = (to[0] + 0.5) * T; player.y = (to[1] + 0.5) * T; player.vx = 0; player.vy = 0;
+      burst(player.x, player.y, '#a855f7', 14);
+      sfx.zap();
+      onPad = true;
+    } else if (!pad) onPad = false;
+
+    // gate button
+    if (gateRT) {
+      if (pc === gateRT.btn[0] && pr === gateRT.btn[1]) { if (gateRT.t <= 0) sfx.button(); gateRT.t = gateRT.dur; }
+      else if (gateRT.t > 0) {
+        gateRT.t -= dt;
+        if (gateRT.t <= 0 && boxHits(player.x, player.y, P_SIZE / 2, (c, r) => gateRT.cells.has(K(c, r)))) gateRT.t = 0.05;
+      }
     }
 
-    const [dx, dy] = inputDir();
-    if (dx || dy) player.face = [dx, dy];
-    moveAxis(dx * P_SPEED * dt, 0);
-    moveAxis(0, dy * P_SPEED * dt);
+    // clock
+    if (L.mods.timer && !isZone(here)) { timeLeft -= dt; if (timeLeft <= 0) { die(); return; } }
 
+    // hazards
     for (const e of enemies) {
+      if (!phaseOn(e, time)) continue;
       const [ex, ey] = enemyPos(e, time);
-      if (touchesEnemy(ex * T, ey * T)) { die(); return; }
+      if (circleHitsPlayer(ex * T, ey * T, E_R)) { die(); return; }
     }
+    for (const b of bouncers) if (circleHitsPlayer(b.x * T, b.y * T, E_R)) { die(); return; }
+    for (const ch of chasers) if (circleHitsPlayer(ch.x * T, ch.y * T, E_R)) { die(); return; }
+    for (const bl of bullets) if (circleHitsPlayer(bl.x, bl.y, B_R)) { die(); return; }
+    for (const lz of L.lasers) {
+      if (cycle(lz.period, lz.ph, time) < lz.on && rectHitsPlayer(...laserRect(lz))) { die(); return; }
+    }
+    for (const sk of L.spikes) {
+      if (cycle(sk.period, sk.ph, time) < 0.45 && rectHitsPlayer(sk.c * T + 5, sk.r * T + 5, T - 10, T - 10)) { die(); return; }
+    }
+
+    // pickups
     for (const c of coins) {
-      if (c.state === 'free' && overlapsCircle(c.x, c.y, 9)) { c.state = 'held'; sfx.coin(); burst(c.x, c.y, '#ffcc1f', 10); }
+      if (c.state === 'free' && circleHitsPlayer(c.x, c.y, 9)) { c.state = 'held'; sfx.coin(); burst(c.x, c.y, '#ffcc1f', 10); }
     }
-    const tile = tileAt(Math.floor(player.x / T), Math.floor(player.y / T));
-    if (tile === 'C') {
-      const cp = centroid('C');
+    for (const k of keysRT) {
+      if (!k.got && circleHitsPlayer((k.c + 0.5) * T, (k.r + 0.5) * T, 10)) {
+        k.got = true; sfx.key();
+        burst((k.c + 0.5) * T, (k.r + 0.5) * T, KEY_COLORS[k.color], 16);
+        doorMap.forEach((dr, key) => { if (dr.color === k.color) { dr.open = true; burst((key % COLS + 0.5) * T, (Math.floor(key / COLS) + 0.5) * T, KEY_COLORS[k.color], 4); } });
+      }
+    }
+
+    if (here === 'C') {
+      const cp = centroidOf('C');
       if (spawn.x !== cp.x || spawn.y !== cp.y) { spawn = cp; sfx.check(); burst(player.x, player.y, '#33c47a', 14); }
       coins.forEach((c) => { if (c.state === 'held') c.state = 'banked'; });
     }
-    if (tile === 'G') {
+    if (here === 'G') {
       if (coins.every((c) => c.state !== 'free')) win();
       else if (lockedBuzz <= 0) { sfx.locked(); lockedBuzz = 0.6; }
+    }
+  }
+
+  function updateMovers(dt) {
+    for (const b of bouncers) {
+      const o = { x: b.x * T, y: b.y * T };
+      if (moveBox(o, b.dx * b.s * T * dt, 0, E_R - 1, enemySolid)) b.dx = -b.dx;
+      if (moveBox(o, 0, b.dy * b.s * T * dt, E_R - 1, enemySolid)) b.dy = -b.dy;
+      b.x = o.x / T; b.y = o.y / T;
+    }
+    const playing = state === 'play' && dying <= 0;
+    const pz = playing && isZone(tileAt(Math.floor(player.x / T), Math.floor(player.y / T)));
+    for (const ch of chasers) {
+      let tx = ch.hx * T, ty = ch.hy * T;
+      const dist = Math.hypot(player.x - ch.x * T, player.y - ch.y * T);
+      if (playing && !pz && dist < ch.aggro * T) { tx = player.x; ty = player.y; }
+      const dx = tx - ch.x * T, dy = ty - ch.y * T, m = Math.hypot(dx, dy);
+      if (m > 2) {
+        const sp = ch.s * T * dt * (tx === player.x ? 1 : 0.6);
+        const o = { x: ch.x * T, y: ch.y * T };
+        moveBox(o, (dx / m) * sp, 0, E_R - 1, enemySolid);
+        moveBox(o, 0, (dy / m) * sp, E_R - 1, enemySolid);
+        ch.x = o.x / T; ch.y = o.y / T;
+      }
+    }
+    for (const tr of turrets) {
+      const k = Math.floor(time / tr.every + tr.ph);
+      if (k > tr.last) {
+        tr.last = k;
+        bullets.push({ x: (tr.c + 0.5 + tr.dx * 0.5) * T, y: (tr.r + 0.5 + tr.dy * 0.5) * T, vx: tr.dx * tr.speed * T, vy: tr.dy * tr.speed * T });
+        if (state === 'play' && Math.hypot(player.x - (tr.c + 0.5) * T, player.y - (tr.r + 0.5) * T) < 8 * T) sfx.shoot();
+      }
+    }
+    for (let i = bullets.length - 1; i >= 0; i--) {
+      const bl = bullets[i];
+      bl.x += bl.vx * dt; bl.y += bl.vy * dt;
+      const c = Math.floor((bl.x + Math.sign(bl.vx) * B_R) / T), r = Math.floor((bl.y + Math.sign(bl.vy) * B_R) / T);
+      if (!inB(c, r) || enemySolid(c, r)) bullets.splice(i, 1);
     }
   }
 
@@ -594,32 +1203,33 @@
     sfx.win();
     burst(player.x, player.y, '#33c47a', 30);
     const key = String(levelIndex);
-    const isBest = bests[key] === undefined || deaths < bests[key];
-    if (isBest) bests[key] = deaths;
-    store.set('needle-bests', bests);
+    if (bests[key] === undefined || deaths < bests[key]) bests[key] = deaths;
+    store.set('nr3-bests', bests);
     const last = levelIndex === LEVELS.length - 1;
-    if (!last && unlocked < levelIndex + 2) { unlocked = levelIndex + 2; store.set('needle-unlocked', unlocked); }
+    // the next level only unlocks by finishing this one
+    if (!last && unlocked < levelIndex + 2) { unlocked = levelIndex + 2; store.set('nr3-unlocked', unlocked); }
     $('clear-deaths').textContent = deaths;
     $('clear-time').textContent = time.toFixed(1) + 's';
     $('clear-best').textContent = bests[key];
     $('clear-title').innerHTML = last ? '<i></i>YOU WON!' : '<i></i>CLEARED';
-    const total = Object.values(bests).reduce((a, b) => a + b, 0);
     const nextPart = partOf(levelIndex + 1);
-    const newPart = !last && nextPart !== partOf(levelIndex);
+    const total = Object.values(bests).reduce((a, b) => a + b, 0);
     $('clear-note').textContent = last
-      ? `All ${LEVELS.length} levels beaten. Your fewest deaths across every level add up to ${total}. Go back and get that number down.`
-      : newPart ? `Part ${nextPart}: ${PARTS[nextPart - 1].name} is unlocked. It gets harder from here.`
+      ? `All ${LEVELS.length} levels beaten. Your fewest deaths across every level add up to ${total}.`
+      : nextPart !== partOf(levelIndex) ? `Part ${nextPart}: ${PARTS[nextPart - 1].name} is unlocked. New tricks and harder levels ahead.`
       : deaths === 0 ? 'Not a single death. Impressive.' : `Level ${nextPart}-${((levelIndex + 1) % 10) + 1} is unlocked.`;
     $('b-next').textContent = last ? 'PLAY AGAIN' : 'NEXT LEVEL';
     setTimeout(() => { $('ov-clear').hidden = false; $('b-next').focus(); }, 450);
   }
 
-  // ---------- menu ----------
+  // =====================================================================
+  // menu
+  // =====================================================================
   let menuPart = partOf(Math.min(unlocked, LEVELS.length) - 1);
   function openMenu() {
     state = 'menu';
     $('ov-clear').hidden = true;
-    if (L && L.part) menuPart = L.part;
+    if (L && L.part && levelIndex < unlocked) menuPart = L.part;
     $('ov-menu').hidden = false;
     paintMenu(true);
   }
@@ -627,8 +1237,7 @@
     const tabs = $('part-tabs');
     tabs.innerHTML = '';
     PARTS.forEach((pt, p) => {
-      const first = p * 10;
-      const b = document.createElement('button');
+      const first = p * 10, b = document.createElement('button');
       b.type = 'button';
       const done = [...Array(10).keys()].every((k) => bests[first + k] !== undefined);
       b.className = 'part' + (p + 1 === menuPart ? ' on' : done ? ' done' : '');
@@ -642,185 +1251,324 @@
     const doneCount = [...Array(10).keys()].filter((k) => bests[base + k] !== undefined).length;
     $('part-name').textContent = `PART ${menuPart} · ${PARTS[menuPart - 1].name.toUpperCase()}`;
     $('part-progress').textContent = `${doneCount}/10 cleared`;
-    const grid = $('lvl-grid');
-    grid.innerHTML = '';
+    const grd = $('lvl-grid');
+    grd.innerHTML = '';
     for (let k = 0; k < 10; k++) {
-      const i = base + k, lv = LEVELS[i];
-      const b = document.createElement('button');
+      const i = base + k, lv = LEVELS[i], b = document.createElement('button');
       b.type = 'button';
       b.className = 'lvl' + (bests[i] !== undefined ? ' done' : '');
       b.disabled = i + 1 > unlocked;
-      b.innerHTML = `${k + 1}<small>${b.disabled ? 'locked' : bests[i] !== undefined ? bests[i] + ' deaths' : lv.name}</small>`;
+      b.title = lv.name;
+      b.innerHTML = `${k + 1}<small>${b.disabled ? 'locked' : bests[i] !== undefined ? bests[i] + ' deaths' : lv.name.split(' · ').pop()}</small>`;
       b.setAttribute('aria-label', `Level ${menuPart}-${k + 1}, ${lv.name}${b.disabled ? ', locked' : ''}`);
       b.addEventListener('click', () => loadLevel(i));
-      grid.appendChild(b);
+      grd.appendChild(b);
     }
     if (focus) {
-      const first = grid.querySelector('.lvl:not(:disabled):not(.done)') || grid.querySelector('.lvl:not(:disabled)');
+      const first = grd.querySelector('.lvl:not(:disabled):not(.done)') || grd.querySelector('.lvl:not(:disabled)');
       if (first) first.focus({ preventScroll: true });
     }
   }
   $('t-menu').addEventListener('click', openMenu);
-  $('t-restart').addEventListener('click', () => { if (state === 'play') restartLevel(); });
+  $('t-restart').addEventListener('click', () => { if (state === 'play') loadLevel(levelIndex); });
   $('b-levels').addEventListener('click', openMenu);
   $('b-next').addEventListener('click', () => loadLevel(levelIndex === LEVELS.length - 1 ? 0 : levelIndex + 1));
   const paintMute = () => { $('t-mute').textContent = muted ? '×' : '♪'; };
   $('t-mute').addEventListener('click', () => { muted = !muted; store.set('needle-muted', muted); paintMute(); });
   paintMute();
 
-  // ---------- drawing ----------
-  function drawBoard() {
+  // =====================================================================
+  // drawing
+  // =====================================================================
+  const theme = () => PARTS[L.part - 1];
+  const X = (c) => c * T, Y = (r) => TOP + r * T;
+
+  function drawTiles() {
     const th = theme();
-    for (let r = 0; r < ROWS; r++) {
-      for (let c = 0; c < COLS; c++) {
-        const ch = tiles[r][c], x = c * T, y = TOP + r * T;
-        if (ch === '#') { ctx.fillStyle = th.wall; ctx.fillRect(x, y, T, T); continue; }
-        if (ch === 'S' || ch === 'C' || ch === 'G') {
-          const locked = ch === 'G' && coins.some((k) => k.state === 'free');
-          ctx.fillStyle = locked ? '#cfe9da' : (c + r) % 2 ? '#a9ecc6' : '#9de4bb';
-          ctx.fillRect(x, y, T, T);
-          if (locked) {
-            ctx.strokeStyle = 'rgba(17,96,58,0.18)'; ctx.lineWidth = 3;
-            ctx.beginPath(); ctx.moveTo(x, y + T); ctx.lineTo(x + T, y); ctx.stroke();
-          }
-          continue;
-        }
-        ctx.fillStyle = (c + r) % 2 ? th.a : th.b;
+    for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
+      const ch = grid[r][c], x = X(c), y = Y(r);
+      if (ch === '#') { ctx.fillStyle = th.wall; ctx.fillRect(x, y, T, T); continue; }
+      if (isZone(ch)) {
+        const locked = ch === 'G' && coins.some((k) => k.state === 'free');
+        ctx.fillStyle = locked ? '#cfe9da' : (c + r) % 2 ? '#a9ecc6' : '#9de4bb';
         ctx.fillRect(x, y, T, T);
+        if (locked) { ctx.strokeStyle = 'rgba(17,96,58,0.18)'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(x, y + T); ctx.lineTo(x + T, y); ctx.stroke(); }
+        continue;
+      }
+      if (ch === 'I') {
+        ctx.fillStyle = (c + r) % 2 ? '#d9f4ff' : '#c9ecfb'; ctx.fillRect(x, y, T, T);
+        ctx.strokeStyle = 'rgba(255,255,255,0.8)'; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(x + 6, y + 22); ctx.lineTo(x + 14, y + 12); ctx.moveTo(x + 18, y + 26); ctx.lineTo(x + 24, y + 18); ctx.stroke();
+        continue;
+      }
+      ctx.fillStyle = (c + r) % 2 ? th.a : th.b;
+      ctx.fillRect(x, y, T, T);
+      if (DIRS[ch]) {
+        const [dx, dy] = DIRS[ch];
+        ctx.fillStyle = 'rgba(80,70,140,0.16)'; ctx.fillRect(x + 1, y + 1, T - 2, T - 2);
+        const shift = ((time * 1.6) % 1) * 12 - 6;
+        ctx.save(); ctx.beginPath(); ctx.rect(x, y, T, T); ctx.clip();
+        ctx.translate(x + T / 2 + dx * shift, y + T / 2 + dy * shift);
+        ctx.rotate(Math.atan2(dy, dx));
+        ctx.strokeStyle = 'rgba(80,70,140,0.55)'; ctx.lineWidth = 3; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+        ctx.beginPath(); ctx.moveTo(-4, -7); ctx.lineTo(3, 0); ctx.lineTo(-4, 7); ctx.stroke();
+        ctx.restore();
       }
     }
-    // wall edges: a darker line where wall meets floor
     ctx.fillStyle = 'rgba(0,0,0,0.45)';
     for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
-      if (tiles[r][c] === '#') continue;
-      const x = c * T, y = TOP + r * T;
+      if (grid[r][c] === '#') continue;
+      const x = X(c), y = Y(r);
       if (tileAt(c, r - 1) === '#') ctx.fillRect(x, y, T, 3);
       if (tileAt(c, r + 1) === '#') ctx.fillRect(x, y + T - 3, T, 3);
       if (tileAt(c - 1, r) === '#') ctx.fillRect(x, y, 3, T);
       if (tileAt(c + 1, r) === '#') ctx.fillRect(x + T - 3, y, 3, T);
     }
-    // goal label
-    const g = centroid('G');
+    const g = centroidOf('G');
     if (g) {
       const locked = coins.some((k) => k.state === 'free');
       ctx.fillStyle = locked ? 'rgba(17,96,58,0.45)' : '#11603a';
-      ctx.font = '700 10px Silkscreen, monospace';
-      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.font = '700 10px Silkscreen, monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
       ctx.fillText(locked ? 'LOCKED' : 'GOAL', g.x, TOP + g.y);
     }
   }
 
+  function drawFixtures() {
+    // doors
+    doorMap.forEach((dr, key) => {
+      const c = key % COLS, r = Math.floor(key / COLS), x = X(c), y = Y(r), col = KEY_COLORS[dr.color];
+      if (dr.open) { ctx.strokeStyle = col; ctx.globalAlpha = 0.35; ctx.lineWidth = 2; ctx.strokeRect(x + 3, y + 3, T - 6, T - 6); ctx.globalAlpha = 1; return; }
+      ctx.fillStyle = col; ctx.fillRect(x + 1, y + 1, T - 2, T - 2);
+      ctx.fillStyle = 'rgba(0,0,0,0.25)'; ctx.fillRect(x + 1, y + T - 6, T - 2, 5);
+      ctx.fillStyle = 'rgba(0,0,0,0.55)';
+      ctx.beginPath(); ctx.arc(x + T / 2, y + 12, 4, 0, Math.PI * 2); ctx.fill();
+      ctx.fillRect(x + T / 2 - 2, y + 13, 4, 9);
+    });
+    // gate and button
+    if (gateRT) {
+      const open = gateRT.t > 0, frac = open ? gateRT.t / gateRT.dur : 0;
+      for (const [c, r] of gateRT.list) {
+        const x = X(c), y = Y(r);
+        if (open) { ctx.strokeStyle = 'rgba(255,122,26,0.45)'; ctx.lineWidth = 2; ctx.strokeRect(x + 3, y + 3, T - 6, T - 6); }
+        else {
+          ctx.fillStyle = '#3b3550'; ctx.fillRect(x, y, T, T);
+          ctx.fillStyle = '#ff7a1a';
+          for (let i = 0; i < 4; i++) ctx.fillRect(x + 3 + i * 7.5, y + 2, 4, T - 4);
+        }
+      }
+      const [bc, br] = gateRT.btn, bx = X(bc) + T / 2, by = Y(br) + T / 2;
+      ctx.fillStyle = '#3b3550'; ctx.beginPath(); ctx.arc(bx, by, 12, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = open ? '#ffd23f' : '#ff7a1a'; ctx.beginPath(); ctx.arc(bx, by, open ? 7 : 9, 0, Math.PI * 2); ctx.fill();
+      if (open) {
+        ctx.strokeStyle = '#ff7a1a'; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.arc(bx, by, 15, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * frac); ctx.stroke();
+      }
+    }
+    // portals
+    for (const p of padsRT) for (const [c, r] of [p.a, p.b]) {
+      const x = X(c) + T / 2, y = Y(r) + T / 2;
+      ctx.fillStyle = 'rgba(168,85,247,0.25)'; ctx.beginPath(); ctx.arc(x, y, 14, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = '#a855f7'; ctx.lineWidth = 3;
+      for (let i = 0; i < 3; i++) { const a = time * 3 + (i * Math.PI * 2) / 3; ctx.beginPath(); ctx.arc(x, y, 11, a, a + 1.1); ctx.stroke(); }
+      ctx.fillStyle = '#6b21a8'; ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI * 2); ctx.fill();
+    }
+    // spikes
+    for (const sk of L.spikes) {
+      const u = cycle(sk.period, sk.ph, time), up = u < 0.45, warn = u > 0.82;
+      const x = X(sk.c), y = Y(sk.r);
+      ctx.fillStyle = up ? 'rgba(200,40,60,0.15)' : warn ? 'rgba(200,40,60,0.12)' : 'rgba(60,60,80,0.08)';
+      ctx.fillRect(x + 2, y + 2, T - 4, T - 4);
+      for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) {
+        const sx = x + 6 + i * 10, sy = y + 6 + j * 10;
+        if (up) {
+          ctx.fillStyle = '#9aa0ae'; ctx.beginPath(); ctx.moveTo(sx - 4, sy + 4); ctx.lineTo(sx, sy - 5); ctx.lineTo(sx + 4, sy + 4); ctx.closePath(); ctx.fill();
+          ctx.fillStyle = '#e8343f'; ctx.beginPath(); ctx.moveTo(sx - 1.5, sy - 1); ctx.lineTo(sx, sy - 5); ctx.lineTo(sx + 1.5, sy - 1); ctx.closePath(); ctx.fill();
+        } else {
+          ctx.fillStyle = warn ? '#b04a5a' : 'rgba(60,60,80,0.35)';
+          ctx.beginPath(); ctx.arc(sx, sy, warn ? 2.2 : 1.6, 0, Math.PI * 2); ctx.fill();
+        }
+      }
+    }
+    // lasers
+    for (const lz of L.lasers) {
+      const u = cycle(lz.period, lz.ph, time), on = u < lz.on, warn = !on && u > 1 - 0.45 / lz.period;
+      const [x, y, w, h] = laserRect(lz);
+      // emitters at both ends
+      ctx.fillStyle = '#5b1730';
+      if (lz.vertical) { ctx.fillRect(x - 3, Y(0) + y - 5, 12, 6); ctx.fillRect(x - 3, Y(0) + y + h - 1, 12, 6); }
+      else { ctx.fillRect(x - 5, Y(0) + y - 3, 6, 12); ctx.fillRect(x + w - 1, Y(0) + y - 3, 6, 12); }
+      if (on) {
+        ctx.fillStyle = 'rgba(255,40,80,0.25)'; ctx.fillRect(x - 4, TOP + y - 4, w + 8, h + 8);
+        ctx.fillStyle = '#ff2d55'; ctx.fillRect(x, TOP + y, w, h);
+        ctx.fillStyle = '#ffd1dc'; ctx.fillRect(lz.vertical ? x + 2 : x, lz.vertical ? TOP + y : TOP + y + 2, lz.vertical ? 2 : w, lz.vertical ? h : 2);
+      } else if (warn && Math.floor(time * 14) % 2 === 0) {
+        ctx.fillStyle = 'rgba(255,45,85,0.5)';
+        ctx.fillRect(lz.vertical ? x + 2 : x, lz.vertical ? TOP + y : TOP + y + 2, lz.vertical ? 2 : w, lz.vertical ? h : 2);
+      }
+    }
+    // turrets
+    for (const tr of turrets) {
+      const x = X(tr.c) + T / 2, y = Y(tr.r) + T / 2;
+      const charge = ((time / tr.every + tr.ph) % 1);
+      ctx.save(); ctx.translate(x, y); ctx.rotate(Math.atan2(tr.dy, tr.dx));
+      ctx.fillStyle = '#111'; ctx.fillRect(4, -5, 14, 10);
+      ctx.fillStyle = '#2b2b38'; ctx.beginPath(); ctx.arc(0, 0, 10, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = charge > 0.75 ? '#ffb020' : '#ff7a1a'; ctx.beginPath(); ctx.arc(0, 0, 4 + (charge > 0.75 ? 1.5 : 0), 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+    }
+  }
+
+  function drawCoinsKeys(alpha) {
+    const bob = Math.sin(performance.now() / 220) * 1.5;
+    ctx.globalAlpha = alpha;
+    for (const c of coins) {
+      if (c.state !== 'free') continue;
+      ctx.beginPath(); ctx.arc(c.x, TOP + c.y + bob, 8, 0, Math.PI * 2); ctx.fillStyle = '#7a5200'; ctx.fill();
+      ctx.beginPath(); ctx.arc(c.x, TOP + c.y + bob, 6, 0, Math.PI * 2); ctx.fillStyle = '#ffcc1f'; ctx.fill();
+      ctx.fillStyle = '#fff1a8'; ctx.fillRect(c.x - 1.5, TOP + c.y + bob - 3.5, 3, 7);
+    }
+    for (const k of keysRT) {
+      if (k.got) continue;
+      const x = X(k.c) + T / 2, y = Y(k.r) + T / 2 + bob, col = KEY_COLORS[k.color];
+      ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.beginPath(); ctx.arc(x - 4, y, 7, 0, Math.PI * 2); ctx.fill(); ctx.fillRect(x - 1, y - 3, 14, 6);
+      ctx.fillStyle = col; ctx.beginPath(); ctx.arc(x - 4, y, 5, 0, Math.PI * 2); ctx.fill(); ctx.fillRect(x, y - 1.5, 11, 3); ctx.fillRect(x + 7, y, 2.5, 5); ctx.fillRect(x + 3, y, 2.5, 4);
+      ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.beginPath(); ctx.arc(x - 4, y, 1.8, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  }
+
   function drawPlayer() {
     const x = player.x, y = TOP + player.y, h = P_SIZE / 2;
-    ctx.fillStyle = '#2a0a10';
-    ctx.fillRect(x - h - 2, y - h - 2, P_SIZE + 4, P_SIZE + 4);
-    ctx.fillStyle = '#ff3b4a';
-    ctx.fillRect(x - h + 1, y - h + 1, P_SIZE - 2, P_SIZE - 2);
-    // eyes that look where you are heading
+    ctx.fillStyle = '#2a0a10'; ctx.fillRect(x - h - 2, y - h - 2, P_SIZE + 4, P_SIZE + 4);
+    ctx.fillStyle = '#ff3b4a'; ctx.fillRect(x - h + 1, y - h + 1, P_SIZE - 2, P_SIZE - 2);
     const [fx, fy] = player.face;
     ctx.fillStyle = '#ffffff';
-    ctx.fillRect(x - 6 + fx * 2, y - 4 + fy * 2, 5, 6);
-    ctx.fillRect(x + 1 + fx * 2, y - 4 + fy * 2, 5, 6);
+    ctx.fillRect(x - 6 + fx * 2, y - 4 + fy * 2, 5, 6); ctx.fillRect(x + 1 + fx * 2, y - 4 + fy * 2, 5, 6);
     ctx.fillStyle = '#2a0a10';
-    ctx.fillRect(x - 5 + fx * 3.5, y - 2 + fy * 3, 2.5, 3);
-    ctx.fillRect(x + 2 + fx * 3.5, y - 2 + fy * 3, 2.5, 3);
+    ctx.fillRect(x - 5 + fx * 3.5, y - 2 + fy * 3, 2.5, 3); ctx.fillRect(x + 2 + fx * 3.5, y - 2 + fy * 3, 2.5, 3);
+  }
+
+  function dot(x, y, fill, edge, r = E_R) {
+    ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fillStyle = edge; ctx.fill();
+    ctx.beginPath(); ctx.arc(x, y, r - 2.5, 0, Math.PI * 2); ctx.fillStyle = fill; ctx.fill();
+  }
+  function drawMovers() {
+    for (const e of enemies) {
+      const [ex, ey] = enemyPos(e, time), x = ex * T, y = TOP + ey * T;
+      if (e.phase && !phaseOn(e, time)) {
+        const u = cycle(e.phase.period, e.phase.ph, time), soon = u > 0.85 && Math.floor(time * 14) % 2 === 0;
+        ctx.strokeStyle = soon ? '#3d6bff' : 'rgba(61,107,255,0.35)'; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.arc(x, y, E_R - 1, 0, Math.PI * 2); ctx.stroke();
+        continue;
+      }
+      dot(x, y, '#3d6bff', '#0c1a4d');
+    }
+    for (const b of bouncers) dot(b.x * T, TOP + b.y * T, '#a855f7', '#3b0d6b');
+    for (const ch of chasers) {
+      const x = ch.x * T, y = TOP + ch.y * T;
+      dot(x, y, '#2b2440', '#000000', E_R + 1);
+      const a = Math.atan2(player.y - ch.y * T, player.x - ch.x * T), ex = Math.cos(a) * 2, ey = Math.sin(a) * 2;
+      ctx.fillStyle = '#ffffff'; ctx.fillRect(x - 5 + ex, y - 3 + ey, 4, 4); ctx.fillRect(x + 1 + ex, y - 3 + ey, 4, 4);
+    }
+    for (const bl of bullets) dot(bl.x, TOP + bl.y, '#ff9f1c', '#7a3300', B_R);
+  }
+
+  function drawDark() {
+    const r = L.mods.dark;
+    const px = state === 'play' && dying > 0 ? spawn.x : player.x, py = TOP + (state === 'play' && dying > 0 ? spawn.y : player.y);
+    const g = ctx.createRadialGradient(px, py, r * 0.5, px, py, r);
+    g.addColorStop(0, 'rgba(6,5,16,0)'); g.addColorStop(1, 'rgba(6,5,16,0.96)');
+    ctx.fillStyle = g; ctx.fillRect(0, TOP, LW, LH - TOP);
   }
 
   function drawHud() {
-    ctx.fillStyle = '#1c1840';
-    ctx.fillRect(0, 0, LW, TOP);
-    ctx.textBaseline = 'middle';
-    ctx.textAlign = 'left';
-    ctx.fillStyle = '#ffcc1f';
-    ctx.font = '700 15px Silkscreen, monospace';
+    ctx.fillStyle = '#1c1840'; ctx.fillRect(0, 0, LW, TOP);
+    ctx.textBaseline = 'middle'; ctx.textAlign = 'left';
+    ctx.fillStyle = '#ffcc1f'; ctx.font = '700 15px Silkscreen, monospace';
     const label = `${L.part}-${(levelIndex % 10) + 1}`;
     ctx.fillText(label, 12, TOP / 2);
-    const lw = ctx.measureText(label).width;
-    ctx.fillStyle = '#f1efff';
-    ctx.font = '400 15px Silkscreen, monospace';
-    ctx.fillText(L.name.toUpperCase(), 22 + lw, TOP / 2);
-    // coins
-    let cx = 270;
-    for (const c of coins) {
-      ctx.beginPath(); ctx.arc(cx, TOP / 2, 6, 0, Math.PI * 2);
-      ctx.fillStyle = c.state === 'free' ? 'rgba(255,255,255,0.18)' : '#ffcc1f';
-      ctx.fill();
-      cx += 17;
+    let x = 22 + ctx.measureText(label).width;
+    ctx.font = '400 12px Silkscreen, monospace';
+    const deathsText = `DEATHS ${deaths}`, rightEdge = 484;
+    const room = rightEdge - ctx.measureText(deathsText).width - 14 - coins.length * 13 - 10 - x;
+    let name = L.name.toUpperCase();
+    if (ctx.measureText(name).width > room) {
+      while (name.length > 3 && ctx.measureText(name + '…').width > room) name = name.slice(0, -1);
+      name = name.trimEnd() + '…';
     }
-    ctx.font = '400 13px Silkscreen, monospace';
-    ctx.fillStyle = '#b9b4e0';
-    ctx.textAlign = 'right';
-    ctx.fillText(`DEATHS ${deaths}`, 470, TOP / 2);
+    ctx.fillStyle = '#f1efff';
+    ctx.fillText(name, x, TOP / 2);
+    x += ctx.measureText(name).width + 14;
+    for (const c of coins) {
+      ctx.beginPath(); ctx.arc(x, TOP / 2, 5, 0, Math.PI * 2);
+      ctx.fillStyle = c.state === 'free' ? 'rgba(255,255,255,0.2)' : '#ffcc1f'; ctx.fill();
+      x += 13;
+    }
+    ctx.fillStyle = '#b9b4e0'; ctx.textAlign = 'right';
+    ctx.fillText(deathsText, rightEdge, TOP / 2);
+
+    // bottom strip (row 11 is always wall): clock and wind
+    const items = [];
+    if (L.mods.timer) items.push({ text: `TIME ${Math.max(0, Math.ceil(timeLeft))}`, color: timeLeft < 5 ? '#ff6b6b' : '#ffffff' });
+    if (L.mods.wind) items.push({ text: 'WIND ' + ({ '1,0': '→', '-1,0': '←', '0,1': '↓', '0,-1': '↑' })[wind.dir.join()], color: '#bfe6ff' });
+    if (items.length) {
+      ctx.font = '700 13px Silkscreen, monospace'; ctx.textAlign = 'center';
+      const y = Y(11) + T / 2;
+      items.forEach((it, i) => {
+        const cx = LW / 2 + (i - (items.length - 1) / 2) * 140;
+        ctx.fillStyle = 'rgba(0,0,0,0.45)'; ctx.fillRect(cx - 60, y - 11, 120, 22);
+        ctx.fillStyle = it.color; ctx.fillText(it.text, cx, y + 1);
+      });
+    }
+    // tip strip (row 0 is always wall)
+    if (toast.t > 0 && toast.text) {
+      ctx.globalAlpha = Math.min(1, toast.t / 0.5);
+      ctx.font = '700 11px "Bricolage Grotesque", sans-serif'; ctx.textAlign = 'center';
+      const w = Math.min(LW - 20, ctx.measureText(toast.text).width + 24), y = Y(0) + T / 2;
+      ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fillRect(LW / 2 - w / 2, y - 11, w, 22);
+      ctx.fillStyle = '#ffffff'; ctx.fillText(toast.text, LW / 2, y + 1);
+      ctx.globalAlpha = 1;
+    }
   }
 
   function render() {
     ctx.setTransform(scale * dpr, 0, 0, scale * dpr, 0, 0);
     ctx.clearRect(0, 0, LW, LH);
-    if (!L) { loadPreview(); }
-    drawBoard();
-
-    // coins
-    const bob = Math.sin(performance.now() / 220) * 1.5;
-    for (const c of coins) {
-      if (c.state !== 'free') continue;
-      ctx.beginPath(); ctx.arc(c.x, TOP + c.y + bob, 8, 0, Math.PI * 2);
-      ctx.fillStyle = '#7a5200'; ctx.fill();
-      ctx.beginPath(); ctx.arc(c.x, TOP + c.y + bob, 6, 0, Math.PI * 2);
-      ctx.fillStyle = '#ffcc1f'; ctx.fill();
-      ctx.fillStyle = '#fff1a8'; ctx.fillRect(c.x - 1.5, TOP + c.y + bob - 3.5, 3, 7);
-    }
-
-    if (state === 'play' && dying <= 0) drawPlayer();
-    if (state === 'clear') drawPlayer();
-
-    // enemies
-    for (const e of enemies) {
-      const [ex, ey] = enemyPos(e, time);
-      ctx.beginPath(); ctx.arc(ex * T, TOP + ey * T, E_R, 0, Math.PI * 2);
-      ctx.fillStyle = '#0c1a4d'; ctx.fill();
-      ctx.beginPath(); ctx.arc(ex * T, TOP + ey * T, E_R - 2.5, 0, Math.PI * 2);
-      ctx.fillStyle = '#3d6bff'; ctx.fill();
-    }
-
+    if (!L) setupLevel(0);
+    drawTiles();
+    drawFixtures();
+    drawCoinsKeys(1);
+    if ((state === 'play' && dying <= 0) || state === 'clear') drawPlayer();
+    drawMovers();
     for (const p of particles) {
       ctx.globalAlpha = Math.max(0, 1 - p.life / p.max);
-      ctx.fillStyle = p.color;
-      ctx.fillRect(p.x - p.size / 2, TOP + p.y - p.size / 2, p.size, p.size);
+      ctx.fillStyle = p.color; ctx.fillRect(p.x - p.size / 2, TOP + p.y - p.size / 2, p.size, p.size);
     }
     ctx.globalAlpha = 1;
-
+    if (L.mods.dark) { drawDark(); drawCoinsKeys(0.45); if ((state === 'play' && dying <= 0) || state === 'clear') drawPlayer(); }
     if (stick && state === 'play') {
-      const r = cv.getBoundingClientRect();
-      const ox = (stick.ox - r.left) / scale, oy = (stick.oy - r.top) / scale;
-      const ink = theme().dark ? '255,255,255' : '45,39,102';
-      ctx.strokeStyle = `rgba(${ink},0.35)`; ctx.lineWidth = 3;
+      const rc = cv.getBoundingClientRect(), ox = (stick.ox - rc.left) / scale, oy = (stick.oy - rc.top) / scale;
+      ctx.strokeStyle = 'rgba(45,39,102,0.35)'; ctx.lineWidth = 3;
       ctx.beginPath(); ctx.arc(ox, oy, 40, 0, Math.PI * 2); ctx.stroke();
       const m = Math.hypot(stick.dx, stick.dy) / scale, f = m > 40 ? 40 / m : 1;
-      ctx.fillStyle = `rgba(${ink},0.4)`;
+      ctx.fillStyle = 'rgba(45,39,102,0.4)';
       ctx.beginPath(); ctx.arc(ox + (stick.dx / scale) * f, oy + (stick.dy / scale) * f, 14, 0, Math.PI * 2); ctx.fill();
     }
-
     drawHud();
   }
 
-  // behind the menu, show level 1 running so the board is never empty
-  function loadPreview() {
-    L = LEVELS[0]; tiles = L.map; enemies = L.enemies.flatMap(buildEnemy);
-    coins = L.coins.map(([c, r]) => ({ x: (c + 0.5) * T, y: (r + 0.5) * T, state: 'free' }));
-    spawn = centroid('S'); player = { x: spawn.x, y: spawn.y, face: [1, 0] };
-    time = 0; deaths = 0; dying = 0; particles = [];
-  }
-
-  // ---------- loop ----------
+  // =====================================================================
+  // loop
+  // =====================================================================
   let last = performance.now();
   function frame(now) {
     const dt = Math.min(0.033, (now - last) / 1000);
     last = now;
-    if (state === 'menu') time += dt;
     update(dt);
     render();
     requestAnimationFrame(frame);
   }
+  setupLevel(0);
   openMenu();
   requestAnimationFrame(frame);
 })();
