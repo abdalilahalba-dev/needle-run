@@ -380,6 +380,7 @@
   };
   let unlocked = store.get('needle-unlocked', 1);
   let bests = store.get('needle-bests', {});
+  Object.keys(bests).forEach((k) => { unlocked = Math.max(unlocked, Math.min(Number(k) + 2, LEVELS.length)); });
   let muted = store.get('needle-muted', false);
 
   // ---------- sound ----------
