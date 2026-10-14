@@ -808,6 +808,15 @@
   }
 
   for (let p = 2; p <= 10; p++) for (let i = 0; i < 10; i++) LEVELS.push(genLevel(p, i));
+  // level 6-3 made easier: no chasers, lasers off for longer, spikes up for less time
+  (() => {
+    const lv = LEVELS[52];
+    lv.chasers = [];
+    lv.lasers.forEach((lz) => { lz.period *= 1.4; lz.on = 0.25; });
+    lv.spikes.forEach((sk) => { sk.period *= 1.6; });
+    lv.features = lv.features.filter((f) => f !== 'chaser');
+    lv.tip = 'Spikes pop out of the floor · Lasers flash on and off. Wait for the gap';
+  })();
   const partOf = (i) => Math.floor(i / 10) + 1;
 
   // =====================================================================
