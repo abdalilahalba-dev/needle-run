@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#1c1840">
 <title>Needle Run</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700&display=swap">
+<link rel="icon" type="image/png" href="icon.png">
+<link rel="apple-touch-icon" href="icon.png">
 <style>
   /* Layout: one landscape board centred in the window, status strip drawn on top, cards for menu / level clear. Single indigo arcade look. */
   :root {
@@ -19,8 +19,9 @@
     --zone: #a9ecc6;
     --zone-ink: #11603a;
     --coin: #ffcc1f;
-    --font-display: "Silkscreen", "Courier New", monospace;
-    --font-body: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+    /* system fonts only: the app has to work with no internet */
+    --font-display: ui-monospace, "SF Mono", Menlo, Consolas, "Courier New", monospace;
+    --font-body: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     color-scheme: dark;
   }
   [hidden] { display: none !important; }
@@ -103,6 +104,71 @@
   }
   .btn.ghost { color: var(--panel-ink); background: #ece9ff; box-shadow: 0 4px 0 #c9c3f2; }
   .btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--player-dark); }
+  .btn.small { padding: 9px 12px; font-size: 13px; }
+  .btn.gold { color: #3a2a00; background: var(--coin); box-shadow: 0 4px 0 #b88a00; }
+  .parts { grid-template-columns: repeat(11, 1fr); }
+  .part.endless { font-size: 16px; }
+  .pager { display: flex; gap: 6px; align-items: center; }
+  .pager button { border: 0; border-radius: 6px; width: 26px; height: 22px; cursor: pointer; background: #ece9ff; color: var(--panel-ink); font: 700 13px var(--font-display); }
+  .pager button:disabled { opacity: 0.35; cursor: default; }
+  .daily-row { display: flex; gap: 8px; align-items: stretch; }
+  .daily-row .btn.small { flex: none; width: 58px; font-size: 18px; }
+  .daily-btn { flex: 1; text-align: left; display: grid; gap: 1px; padding: 8px 12px; }
+  .daily-btn small { font: 400 11px var(--font-body); opacity: 0.85; }
+  .set-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 15px; font-weight: 700; }
+  .switch { width: 54px; height: 30px; border-radius: 99px; border: 0; cursor: pointer; background: #d9d5f0; position: relative; flex: none; }
+  .switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.3); transition: left 0.15s; }
+  .switch[aria-checked="true"] { background: #33c47a; }
+  .switch[aria-checked="true"]::after { left: 27px; }
+  .note { margin: 0; font-size: 11.5px; line-height: 1.45; color: var(--panel-muted); }
+  .note b { color: var(--panel-ink); }
+  .share-grid { margin: 0; font-size: 18px; letter-spacing: 1px; word-break: break-all; }
+  .toast { position: fixed; left: 50%; bottom: max(20px, env(safe-area-inset-bottom)); transform: translateX(-50%); background: #fff; color: #111; font: 700 14px var(--font-body); padding: 10px 16px; border-radius: 99px; z-index: 50; pointer-events: none; }
+  /* reads the phone's notch / home-bar insets so the board never sits under them */
+  .safe-probe { position: fixed; visibility: hidden; pointer-events: none; padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
+  /* ---------- look and motion ---------- */
+  body {
+    background:
+      radial-gradient(60vmax 60vmax at 12% 18%, rgba(255, 59, 74, 0.16), transparent 60%),
+      radial-gradient(55vmax 55vmax at 88% 82%, rgba(61, 107, 255, 0.18), transparent 60%),
+      radial-gradient(40vmax 40vmax at 80% 10%, rgba(255, 204, 31, 0.08), transparent 60%),
+      var(--page);
+    background-size: 140% 140%;
+    animation: drift 18s ease-in-out infinite alternate;
+  }
+  @keyframes drift { from { background-position: 0% 0%; } to { background-position: 100% 100%; } }
+  .game { box-shadow: 0 24px 70px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.06), 0 0 60px rgba(255, 59, 74, 0.12); }
+  .overlay { background: radial-gradient(ellipse at 50% 40%, rgba(40, 30, 100, 0.45), rgba(14, 10, 40, 0.75)); animation: fade 0.25s ease-out; }
+  .overlay .card { animation: pop 0.38s cubic-bezier(0.2, 1.4, 0.4, 1); box-shadow: 0 6px 0 #0f0c2b, 0 20px 50px rgba(0, 0, 0, 0.35); }
+  @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes pop { from { opacity: 0; transform: translateY(14px) scale(0.94); } to { opacity: 1; transform: none; } }
+  .title i { animation: hop 1.8s ease-in-out infinite; }
+  @keyframes hop { 0%, 60%, 100% { transform: translateY(0) rotate(0); } 70% { transform: translateY(-6px) rotate(-8deg) scaleY(1.08); } 80% { transform: translateY(0) scaleY(0.88) scaleX(1.1); } 90% { transform: translateY(-2px) rotate(4deg); } }
+  .btn, .lvl, .part, .tool, .switch { transition: transform 0.12s, box-shadow 0.12s, filter 0.12s, background 0.15s; }
+  .btn:hover, .lvl:not(:disabled):hover { filter: brightness(1.06); transform: translateY(-1px); }
+  .btn:active, .lvl:not(:disabled):active { transform: translateY(3px); filter: brightness(0.96); }
+  .btn.gold { background: linear-gradient(180deg, #ffd84d, #ffc21a); }
+  .btn:not(.ghost):not(.gold) { background: linear-gradient(180deg, #ff5866, #ff3b4a); }
+  .daily-btn { position: relative; overflow: hidden; }
+  .daily-btn::after { content: ""; position: absolute; inset: 0; background: linear-gradient(105deg, transparent 35%, rgba(255, 255, 255, 0.55) 50%, transparent 65%); transform: translateX(-120%); animation: shine 3.6s ease-in-out infinite; pointer-events: none; }
+  @keyframes shine { 0%, 65% { transform: translateX(-120%); } 100% { transform: translateX(120%); } }
+  .lvl.done { background: linear-gradient(180deg, #b9f2d2, #a9ecc6); }
+  #lvl-grid .lvl { animation: rise 0.35s ease-out backwards; }
+  #lvl-grid .lvl:nth-child(2) { animation-delay: 0.02s; } #lvl-grid .lvl:nth-child(3) { animation-delay: 0.04s; }
+  #lvl-grid .lvl:nth-child(4) { animation-delay: 0.06s; } #lvl-grid .lvl:nth-child(5) { animation-delay: 0.08s; }
+  #lvl-grid .lvl:nth-child(6) { animation-delay: 0.1s; } #lvl-grid .lvl:nth-child(7) { animation-delay: 0.12s; }
+  #lvl-grid .lvl:nth-child(8) { animation-delay: 0.14s; } #lvl-grid .lvl:nth-child(9) { animation-delay: 0.16s; }
+  #lvl-grid .lvl:nth-child(10) { animation-delay: 0.18s; }
+  @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  #clear-title { animation: bounce-in 0.6s cubic-bezier(0.2, 1.6, 0.4, 1) 0.1s backwards; }
+  @keyframes bounce-in { from { opacity: 0; transform: scale(0.6); } to { opacity: 1; transform: none; } }
+  .stats b { animation: rise 0.4s ease-out 0.25s backwards; }
+  .share-grid { animation: rise 0.4s ease-out 0.4s backwards; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+  .rotate { position: fixed; inset: 0; display: none; place-items: center; text-align: center; padding: 24px; background: var(--page); z-index: 60; font: 700 18px var(--font-body); }
+  @media (orientation: portrait) and (pointer: coarse) { .rotate { display: grid; } }
 </style>
 </head>
 <body>
@@ -110,20 +176,53 @@
 <div class="game" id="game">
   <canvas id="cv"></canvas>
   <div class="ui" id="ui">
-    <div class="tools">
-      <button class="tool" id="t-menu" type="button">LEVELS</button>
+    <div class="tools" id="tools" hidden>
       <button class="tool" id="t-restart" type="button" aria-label="Restart level (R)">R</button>
-      <button class="tool" id="t-mute" type="button" aria-label="Sound on or off">♪</button>
+      <button class="tool" id="t-pause" type="button" aria-label="Pause (Esc)">II</button>
     </div>
 
     <div class="overlay" id="ov-menu">
       <div class="card">
         <h1 class="title"><i></i>NEEDLE RUN</h1>
-        <p class="lead">Grab <b>every coin</b>, reach the <b>green goal</b>, don't get touched. 10 parts, each with a new way to play. 100 different levels.</p>
+        <p class="lead">Grab <b>every coin</b>, reach the <b>green goal</b>, don't get touched. 100 levels in 10 parts, then <b>endless new levels</b>.</p>
+        <div class="daily-row">
+          <button class="btn gold daily-btn" id="b-daily" type="button"><span id="daily-name">DAILY NEEDLE</span><small id="daily-status">A new level every day</small></button>
+          <button class="btn ghost small" id="b-settings" type="button" aria-label="Settings">⚙</button>
+        </div>
         <div class="parts" id="part-tabs"></div>
-        <p class="part-head"><b id="part-name">PART 1</b><span id="part-progress"></span></p>
+        <div class="part-head"><b id="part-name">PART 1</b><span class="pager" id="pager" hidden><button type="button" id="pg-prev" aria-label="Previous page">‹</button><button type="button" id="pg-next" aria-label="Next page">›</button></span><span id="part-progress"></span></div>
         <div class="grid" id="lvl-grid"></div>
-        <p class="keys">Arrow keys or WASD to move · R to restart · On a phone, drag anywhere to steer</p>
+        <p class="keys">Arrow keys or WASD · R restart · Esc pause · On a phone, drag anywhere to steer</p>
+      </div>
+    </div>
+
+    <div class="overlay" id="ov-pause" hidden>
+      <div class="card">
+        <h2 class="title"><i></i>PAUSED</h2>
+        <p class="lead" id="pause-info"></p>
+        <div class="row">
+          <button class="btn" id="p-resume" type="button">RESUME</button>
+          <button class="btn ghost" id="p-restart" type="button">RESTART</button>
+        </div>
+        <div class="row">
+          <button class="btn ghost" id="p-levels" type="button">MENU</button>
+          <button class="btn ghost" id="p-settings" type="button">SETTINGS</button>
+        </div>
+        <button class="btn ghost small" id="p-skip" type="button" hidden>SKIP THIS ENDLESS LEVEL</button>
+      </div>
+    </div>
+
+    <div class="overlay" id="ov-settings" hidden>
+      <div class="card">
+        <h2 class="title"><i></i>SETTINGS</h2>
+        <div class="set-row">Music<button class="switch" id="s-music" type="button" role="switch" aria-checked="true" aria-label="Music"></button></div>
+        <div class="set-row">Sound effects<button class="switch" id="s-sound" type="button" role="switch" aria-checked="true" aria-label="Sound effects"></button></div>
+        <div class="set-row">Vibration<button class="switch" id="s-haptics" type="button" role="switch" aria-checked="true" aria-label="Vibration"></button></div>
+        <p class="note" id="privacy-note"><b>Privacy:</b> Needle Run keeps your progress only on this device. It has no accounts and collects no personal data.</p>
+        <div class="row">
+          <button class="btn ghost small" id="s-privacy" type="button" hidden>AD PRIVACY CHOICES</button>
+          <button class="btn small" id="s-back" type="button">DONE</button>
+        </div>
       </div>
     </div>
 
@@ -131,15 +230,19 @@
       <div class="card">
         <h2 class="title" id="clear-title"><i></i>CLEARED</h2>
         <p class="stats"><span><b id="clear-deaths">0</b>deaths</span><span><b id="clear-time">0.0s</b>time</span><span><b id="clear-best">0</b>fewest deaths</span></p>
+        <p class="share-grid" id="clear-grid" hidden></p>
         <p class="lead" id="clear-note"></p>
         <div class="row">
-          <button class="btn ghost" id="b-levels" type="button">LEVELS</button>
+          <button class="btn ghost" id="b-levels" type="button">MENU</button>
+          <button class="btn gold" id="b-share" type="button" hidden>SHARE</button>
           <button class="btn" id="b-next" type="button">NEXT LEVEL</button>
         </div>
       </div>
     </div>
   </div>
 </div>
+<div class="safe-probe" id="safe-probe"></div>
+<div class="rotate">Turn your phone sideways to play 📱↻</div>
 
 <script>
 (() => {
@@ -809,6 +912,124 @@
 
   for (let p = 2; p <= 10; p++) for (let i = 0; i < 10; i++) LEVELS.push(genLevel(p, i));
   const partOf = (i) => Math.floor(i / 10) + 1;
+  const CAMPAIGN = LEVELS.length; // 100
+  const DAILY = -1;
+
+  // =====================================================================
+  // solver: is there a route past the timed hazards to every coin, key and the goal?
+  // Steps tile by tile at the player's speed and checks patrols, spinners, ghosts,
+  // lasers and spikes along the way. Used to throw away unfair endless / daily levels.
+  // =====================================================================
+  function solveLevel(lv) {
+    const g = lv.tiles.map((row) => row.split(''));
+    const tile = (c, r) => (inB(c, r) ? g[r][c] : '#');
+    const ens = lv.enemies.flatMap(buildEnemy);
+    const doorAt = new Map(lv.doors.map((dr) => [K(dr.c, dr.r), dr.color]));
+    const gateCells = lv.gate ? new Set(lv.gate.cells.map(([c, r]) => K(c, r))) : new Set();
+    const pads = new Map();
+    for (const p of lv.pads) { pads.set(K(...p.a), p.b); pads.set(K(...p.b), p.a); }
+    const hitC = (px, py, x, y, r) => { const h = P_SIZE / 2 - 1; const cx = Math.max(px - h, Math.min(x, px + h)), cy = Math.max(py - h, Math.min(y, py + h)); return (x - cx) ** 2 + (y - cy) ** 2 < r * r; };
+    const hitR = (px, py, x, y, w, h) => { const p = P_SIZE / 2 - 2; return px + p > x && px - p < x + w && py + p > y && py - p < y + h; };
+    const danger = (px, py, t) => {
+      for (const e of ens) { if (!phaseOn(e, t)) continue; const [ex, ey] = enemyPos(e, t); if (hitC(px, py, ex * T, ey * T, E_R + 1)) return true; }
+      for (const lz of lv.lasers) if (cycle(lz.period, lz.ph, t) < lz.on && hitR(px, py, ...laserRect(lz))) return true;
+      for (const sk of lv.spikes) if (cycle(sk.period, sk.ph, t) < 0.45 && hitR(px, py, sk.c * T + 5, sk.r * T + 5, T - 10, T - 10)) return true;
+      return false;
+    };
+    const step = T / P_SPEED, SUB = 4, MAXS = 320;
+    const starts = cellsWhere(g, (c, r, x) => x === 'S');
+    const search = (open, gateOpen) => {
+      const blocked = (c, r) => {
+        if (tile(c, r) === '#') return true;
+        const k = K(c, r);
+        if (doorAt.has(k) && !open.has(doorAt.get(k))) return true;
+        return !gateOpen && gateCells.has(k);
+      };
+      const reached = new Set(starts.map(([c, r]) => K(c, r)));
+      let frontier = starts.slice();
+      for (let s = 0; s < MAXS && frontier.length; s++) {
+        const next = new Map(), t0 = s * step;
+        for (const [c, r] of frontier) {
+          for (const [dc, dr] of [[0, 0], [1, 0], [-1, 0], [0, 1], [0, -1]]) {
+            let nc = c + dc, nr = r + dr;
+            if (blocked(nc, nr)) continue;
+            let ok = true;
+            for (let k = 1; k <= SUB && ok; k++) {
+              const f = k / SUB, px = (c + dc * f + 0.5) * T, py = (r + dr * f + 0.5) * T;
+              if (!isZone(tile(Math.floor(px / T), Math.floor(py / T))) && danger(px, py, t0 + f * step)) ok = false;
+            }
+            if (!ok) continue;
+            const to = (dc || dr) ? pads.get(K(nc, nr)) : null;
+            if (to) { reached.add(K(nc, nr)); nc = to[0]; nr = to[1]; }
+            reached.add(K(nc, nr));
+            next.set(K(nc, nr), [nc, nr]);
+          }
+        }
+        frontier = [...next.values()];
+      }
+      return reached;
+    };
+    const open = new Set();
+    let gateOpen = false, reached = new Set();
+    for (let it = 0; it < 5; it++) {
+      reached = search(open, gateOpen);
+      let changed = false;
+      for (const k of lv.keys) if (reached.has(K(k.c, k.r)) && !open.has(k.color)) { open.add(k.color); changed = true; }
+      if (lv.gate && !gateOpen && reached.has(K(...lv.gate.btn))) { gateOpen = true; changed = true; }
+      if (!changed) break;
+    }
+    const goalOk = cellsWhere(g, (c, r, x) => x === 'G').some(([c, r]) => reached.has(K(c, r)));
+    return goalOk && lv.coins.every(([c, r]) => reached.has(K(c, r))) && lv.keys.every((k) => reached.has(K(k.c, k.r)));
+  }
+
+  // =====================================================================
+  // endless levels after level 100: they never run out and keep getting faster
+  // =====================================================================
+  const MIX_POOL = PLAN[10].pool;
+  function buildMixed(seed, d, part, idx, modChance) {
+    for (let attempt = 0; attempt < 40; attempt++) {
+      const R = makeR(seed + attempt * 104729);
+      const layout = R.pick(LAYOUT_KEYS);
+      let features = R.shuffle(MIX_POOL).slice(0, R.pick([2, 2, 3]));
+      if (!features.some((f) => HAZARDS.includes(f))) features.unshift(R.pick(HAZARDS));
+      if (features.includes('gate') && (features.includes('keys') || features.includes('portal'))) features = features.filter((f) => f !== 'gate');
+      const mods = R.chance(modChance) ? R.pick(MODSETS) : [];
+      const lv = tryBuild(R, d, part, idx, layout, features, mods);
+      if (!lv || !solveLevel(lv)) continue;
+      lv.name = `${LAYOUT_NAMES[layout]} · ${mods.length ? mods.map((m) => FEATURE_NAMES[m]).join(' + ') : FEATURE_NAMES[features[0]]}`;
+      return lv;
+    }
+    return null;
+  }
+  const endlessCache = new Map();
+  function getLevel(i) {
+    if (i === DAILY) return dailyLevel();
+    if (i < CAMPAIGN) return LEVELS[i];
+    if (!endlessCache.has(i)) {
+      const part = partOf(i), idx = i % 10;
+      // past level 100 everything is at full strength, and every 10 levels it speeds up a little more
+      const d = 1 + Math.min(0.25, (part - 11) * 0.025);
+      const lv = buildMixed(910003 + i * 7919, d, part, idx, 0.55) || LEVELS[90 + idx];
+      endlessCache.set(i, { ...lv, part, theme: (i * 7) % 10, endless: true });
+    }
+    return endlessCache.get(i);
+  }
+
+  // =====================================================================
+  // Daily Needle: one level a day, the same for everyone
+  // =====================================================================
+  const DAY0 = Date.UTC(2026, 0, 1);
+  const dayNumber = () => Math.floor((Date.now() - DAY0) / 86400000) + 1;
+  let dailyCache = null;
+  function dailyLevel() {
+    const n = dayNumber();
+    if (!dailyCache || dailyCache.daily !== n) {
+      const d = 0.62 + (n % 5) * 0.06;
+      const lv = buildMixed(777000 + n * 97, d, 0, 0, 0.4) || LEVELS[60 + (n % 30)];
+      dailyCache = { ...lv, part: 0, theme: n % 10, daily: n };
+    }
+    return dailyCache;
+  }
 
   // =====================================================================
   // canvas sizing
@@ -822,7 +1043,12 @@
   let scale = 1, dpr = 1;
   function fit() {
     dpr = Math.min(window.devicePixelRatio || 1, 2);
-    scale = Math.max(0.3, Math.min((window.innerWidth - 32) / LW, (window.innerHeight - 32) / LH));
+    // keep clear of the notch and home bar on phones
+    const ps = getComputedStyle($('safe-probe'));
+    const sx = Math.max(parseFloat(ps.paddingLeft) || 0, parseFloat(ps.paddingRight) || 0);
+    const sy = Math.max(parseFloat(ps.paddingTop) || 0, parseFloat(ps.paddingBottom) || 0);
+    const gap = window.innerHeight < 500 ? 8 : 16;
+    scale = Math.max(0.3, Math.min((window.innerWidth - 2 * Math.max(gap, sx)) / LW, (window.innerHeight - 2 * Math.max(gap, sy)) / LH));
     game.style.width = LW * scale + 'px';
     game.style.height = LH * scale + 'px';
     cv.width = Math.round(LW * scale * dpr);
@@ -839,6 +1065,7 @@
     get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
     set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
   };
+  // progress carries over from the earlier web version
   let unlocked = store.get('nr3-unlocked', null);
   let bests = store.get('nr3-bests', null);
   if (unlocked === null) {
@@ -848,26 +1075,265 @@
     unlocked = Math.min(store.get('needle-unlocked', 1), 11);
     store.set('nr3-unlocked', unlocked); store.set('nr3-bests', bests);
   }
-  Object.keys(bests).forEach((k) => { unlocked = Math.max(unlocked, Math.min(Number(k) + 2, LEVELS.length)); });
-  store.set('nr3-unlocked', unlocked);
-  let muted = store.get('needle-muted', false);
+  const settings = Object.assign({ sound: !store.get('needle-muted', false), music: true, haptics: true }, store.get('nr-settings', {}));
+  const saveSettings = () => store.set('nr-settings', settings);
+  const money = Object.assign({ clearsSinceAd: 0, adsRemoved: false }, store.get('nr-ads', {}));
+  const saveMoney = () => store.set('nr-ads', money);
+  const dailyLog = store.get('nr-daily', {});
+  const saveDaily = () => store.set('nr-daily', dailyLog);
+
+  // =====================================================================
+  // phone app extras (Capacitor plugins). In a normal browser these are null and skipped.
+  // =====================================================================
+  const pluginCache = {};
+  function nativePlugin(name) {
+    const C = window.Capacitor;
+    if (!C || !C.isNativePlatform || !C.isNativePlatform()) return null;
+    if (pluginCache[name]) return pluginCache[name];
+    if (C.isPluginAvailable && !C.isPluginAvailable(name)) return null;
+    const p = (C.Plugins && C.Plugins[name]) || (C.registerPlugin ? C.registerPlugin(name) : null);
+    pluginCache[name] = p;
+    return p;
+  }
+  function haptic(kind) {
+    if (!settings.haptics) return;
+    const cap = nativePlugin('Haptics');
+    try {
+      if (cap) {
+        if (kind === 'win') cap.notification({ type: 'SUCCESS' });
+        else cap.impact({ style: kind === 'death' ? 'HEAVY' : kind === 'key' ? 'MEDIUM' : 'LIGHT' });
+        return;
+      }
+      if (navigator.vibrate) navigator.vibrate(kind === 'death' ? 45 : kind === 'win' ? [20, 40, 20] : 8);
+    } catch (e) {}
+  }
+
+  // ads: a full-screen AdMob ad after every 2 cleared levels, never in the middle of a level.
+  // Only runs inside the phone app. With no internet, no ad shows and play just continues.
+  const ADS = {
+    every: 2,
+    // Google's official TEST ad units. Replace with your own AdMob unit ids and set testing: false before release.
+    ios: 'ca-app-pub-3940256099942544/4411468910',
+    android: 'ca-app-pub-3940256099942544/1033173712',
+    testing: true
+  };
+  const admob = () => nativePlugin('AdMob');
+  let adsReady = false, privacyOptions = false;
+  async function initAds() {
+    const plugin = admob();
+    if (!plugin || adsReady || money.adsRemoved) return;
+    try {
+      await plugin.initialize({ initializeForTesting: ADS.testing });
+      // Europe and other regions: Google's consent form (UMP), then Apple's tracking prompt on iPhone
+      try {
+        const info = await plugin.requestConsentInfo();
+        if (info && info.isConsentFormAvailable && info.status === 'REQUIRED') await plugin.showConsentForm();
+        const again = await plugin.requestConsentInfo();
+        privacyOptions = !!(again && again.privacyOptionsRequirementStatus === 'REQUIRED');
+      } catch (e) {}
+      try { if (plugin.requestTrackingAuthorization) await plugin.requestTrackingAuthorization(); } catch (e) {}
+      adsReady = true;
+    } catch (e) { adsReady = false; }
+  }
+  async function maybeShowAd() {
+    if (!admob() || money.adsRemoved) return;
+    money.clearsSinceAd++;
+    saveMoney();
+    if (money.clearsSinceAd < ADS.every) return;
+    try {
+      await initAds();
+      const isIOS = window.Capacitor.getPlatform && window.Capacitor.getPlatform() === 'ios';
+      await admob().prepareInterstitial({ adId: isIOS ? ADS.ios : ADS.android, isTesting: ADS.testing });
+      await admob().showInterstitial();
+      money.clearsSinceAd = 0;
+      saveMoney();
+    } catch (e) { /* no internet or no ad to show: keep playing */ }
+  }
+
+  function showToast(msg) {
+    const t = document.createElement('div');
+    t.className = 'toast'; t.textContent = msg; t.setAttribute('role', 'status');
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 2200);
+  }
 
   // =====================================================================
   // sound
   // =====================================================================
-  let ac = null;
+  // one audio graph: sound effects and music each get a volume knob, then a limiter
+  let ac = null, sfxOut = null, musicOut = null, noiseBuf = null;
+  function audio() {
+    if (!ac) {
+      ac = new (window.AudioContext || window.webkitAudioContext)();
+      const comp = ac.createDynamicsCompressor();
+      comp.threshold.value = -14; comp.ratio.value = 4;
+      comp.connect(ac.destination);
+      sfxOut = ac.createGain(); sfxOut.connect(comp);
+      musicOut = ac.createGain(); musicOut.gain.value = 0; musicOut.connect(comp);
+      noiseBuf = ac.createBuffer(1, ac.sampleRate * 0.5, ac.sampleRate);
+      const d = noiseBuf.getChannelData(0);
+      for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    }
+    if (ac.state === 'suspended' && !document.hidden) ac.resume();
+    return ac;
+  }
   function tone(freq, dur, type = 'square', vol = 0.05, slideTo = null, delay = 0) {
-    if (muted) return;
+    if (!settings.sound) return;
     try {
-      if (!ac) ac = new (window.AudioContext || window.webkitAudioContext)();
-      if (ac.state === 'suspended') ac.resume();
+      audio();
       const t = ac.currentTime + delay, o = ac.createOscillator(), gn = ac.createGain();
       o.type = type; o.frequency.setValueAtTime(freq, t);
       if (slideTo) o.frequency.exponentialRampToValueAtTime(slideTo, t + dur);
       gn.gain.setValueAtTime(vol, t); gn.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-      o.connect(gn).connect(ac.destination); o.start(t); o.stop(t + dur + 0.02);
+      o.connect(gn).connect(sfxOut); o.start(t); o.stop(t + dur + 0.02);
     } catch (e) {}
   }
+
+  // =====================================================================
+  // music: made live with Web Audio (no files, works offline).
+  // Easy parts get a slow, soft, major-key tune. Harder parts get faster and add
+  // drums, bass, hi-hats and a fast lead, in darker keys. Every level has its own tune.
+  // =====================================================================
+  const Music = (() => {
+    const midi = (m) => 440 * Math.pow(2, (m - 69) / 12);
+    const SCALES = {
+      bright: [0, 2, 4, 7, 9, 12, 14, 16],      // major pentatonic
+      warm: [0, 2, 4, 5, 7, 9, 11, 12],         // major
+      cool: [0, 2, 3, 5, 7, 9, 10, 12],         // dorian
+      dark: [0, 2, 3, 5, 7, 8, 10, 12],         // minor
+      tense: [0, 1, 3, 5, 7, 8, 11, 12]         // harmonic-ish, for the hardest levels
+    };
+    const PROGS = [[0, 5, 3, 4], [0, 3, 5, 4], [0, 4, 5, 3], [5, 3, 0, 4], [0, 0, 3, 4], [0, 5, 6, 4]];
+    let song = null, timer = null, step = 0, nextT = 0, level = 1, paused = false;
+
+    function makeSong(x, seed) {
+      const R = makeR(seed * 7 + 3);
+      const scale = x < 0.2 ? SCALES.bright : x < 0.4 ? SCALES.warm : x < 0.62 ? SCALES.cool : x < 0.85 ? SCALES.dark : SCALES.tense;
+      // a short melody motif, reused with small changes so it sticks
+      const motif = Array.from({ length: 16 }, (_, k) => (k % 4 === 0 || R.chance(0.45 + x * 0.3)) ? R.i(0, 7) : -1);
+      return {
+        x, bpm: Math.round(84 + x * 66), root: 45 + R.pick([0, 2, 3, 5, 7, -2]),
+        scale, prog: R.pick(PROGS), motif, arpShape: R.pick([[0, 2, 4, 2], [0, 4, 2, 4], [0, 2, 4, 7], [4, 2, 0, 2]]),
+        swing: x < 0.3 ? 0.08 : 0
+      };
+    }
+    const deg = (s, d) => { const n = s.scale.length - 1; return s.scale[((d % n) + n) % n] + 12 * Math.floor(d / n); };
+
+    function voice(type, f, t, dur, vol, opts = {}) {
+      const o = ac.createOscillator(), g = ac.createGain();
+      o.type = type; o.frequency.setValueAtTime(f, t);
+      if (opts.detune) o.detune.value = opts.detune;
+      if (opts.slide) o.frequency.exponentialRampToValueAtTime(opts.slide, t + dur);
+      let node = o;
+      if (opts.lp) { const fl = ac.createBiquadFilter(); fl.type = 'lowpass'; fl.frequency.value = opts.lp; fl.Q.value = opts.q || 1; o.connect(fl); node = fl; }
+      const a = opts.attack || 0.005;
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(vol, t + a);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      node.connect(g).connect(musicOut);
+      o.start(t); o.stop(t + dur + 0.05);
+    }
+    function noise(t, dur, vol, hp) {
+      const s = ac.createBufferSource(), f = ac.createBiquadFilter(), g = ac.createGain();
+      s.buffer = noiseBuf; f.type = 'highpass'; f.frequency.value = hp;
+      g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      s.connect(f).connect(g).connect(musicOut); s.start(t); s.stop(t + dur + 0.02);
+    }
+
+    function play16(s, i, t) {
+      const x = s.x, sixteenth = i % 16, bar = Math.floor(i / 16) % 4, beat = sixteenth % 4 === 0;
+      const chord = s.prog[bar], root = s.root;
+      const third = deg(s, chord + 2), fifth = deg(s, chord + 4), base = deg(s, chord);
+      const spb = 60 / s.bpm;
+      // pad: soft chord at the start of every bar (always there)
+      if (sixteenth === 0) {
+        const padVol = 0.035 - x * 0.012;
+        for (const n of [base, third, fifth]) voice('triangle', midi(root + 12 + n), t, spb * 4.2, padVol, { attack: 0.25, lp: 1400 });
+      }
+      // bass from the 2nd part onwards; faster in hard parts
+      if (x >= 0.12) {
+        const hit = x < 0.5 ? (sixteenth === 0 || sixteenth === 8) : x < 0.8 ? sixteenth % 4 === 0 || sixteenth === 14 : sixteenth % 2 === 0;
+        if (hit) voice('sawtooth', midi(root - 12 + base + (x > 0.8 && sixteenth % 8 === 6 ? 12 : 0)), t, spb * (x < 0.5 ? 1.6 : 0.45), 0.07, { lp: 380 + x * 700, q: 4 });
+      }
+      // kick
+      if (x >= 0.25 && (beat || (x > 0.75 && sixteenth === 10))) {
+        voice('sine', 150, t, 0.28, 0.32, { slide: 42 });
+      }
+      // snare / clap on 2 and 4
+      if (x >= 0.42 && (sixteenth === 4 || sixteenth === 12)) { noise(t, 0.16, 0.12, 1500); voice('triangle', 190, t, 0.08, 0.06); }
+      // hi-hats: 8ths, then 16ths in the hardest parts
+      if (x >= 0.33 && (x > 0.68 ? true : sixteenth % 2 === 0)) noise(t, sixteenth % 4 === 2 ? 0.06 : 0.03, sixteenth % 4 === 2 ? 0.05 : 0.028, 7000);
+      // melody: slow and sparse when easy, a fast arpeggio when hard
+      if (x < 0.55) {
+        const n = s.motif[sixteenth];
+        if (n >= 0 && (sixteenth % 2 === 0) && (bar !== 3 || sixteenth < 8)) voice('triangle', midi(root + 24 + deg(s, chord + n)), t, spb * 0.9, 0.045, { attack: 0.01 });
+      } else {
+        const a = s.arpShape[sixteenth % 4];
+        if (x > 0.7 || sixteenth % 2 === 0) voice('square', midi(root + 24 + deg(s, chord + a)), t, spb * 0.22, 0.022, { lp: 2600 + x * 2000 });
+        const n = s.motif[sixteenth];
+        if (n >= 0 && sixteenth % 4 === 0 && bar % 2 === 1) voice('sawtooth', midi(root + 36 + deg(s, chord + n)), t, spb * 0.9, 0.018, { lp: 3000, detune: 6 });
+      }
+    }
+
+    function tick() {
+      if (!ac || !song || paused) return;
+      const spb16 = 60 / song.bpm / 4;
+      if (nextT < ac.currentTime) nextT = ac.currentTime + 0.05;
+      while (nextT < ac.currentTime + 0.15) {
+        const sw = step % 2 === 1 ? song.swing * spb16 * 2 : 0;
+        try { play16(song, step, nextT + sw); } catch (e) {}
+        nextT += spb16;
+        step++;
+      }
+    }
+    function fadeTo(v, sec = 0.4) {
+      if (!ac) return;
+      const t = ac.currentTime;
+      musicOut.gain.cancelScheduledValues(t);
+      musicOut.gain.setValueAtTime(musicOut.gain.value, t);
+      musicOut.gain.linearRampToValueAtTime(v, t + sec);
+    }
+    const vol = () => (settings.music ? 0.55 : 0) * level;
+    return {
+      // x: 0 = calm, 1 = hardest. Same seed = same tune.
+      play(x, seed) {
+        if (!settings.music) { song = null; return; }
+        try { audio(); } catch (e) { return; }
+        const next = makeSong(x, seed);
+        if (song && song.bpm === next.bpm && song.root === next.root && song.motif.join() === next.motif.join()) { this.setLevel(1); return; }
+        const start = () => {
+          song = next; step = 0; nextT = ac.currentTime + 0.08; paused = false; level = 1;
+          fadeTo(vol(), 0.5);
+          if (!timer) timer = setInterval(tick, 25);
+        };
+        if (song) { fadeTo(0, 0.25); setTimeout(start, 260); } else start();
+      },
+      stop(sec = 0.6) { const s = song; fadeTo(0, sec); setTimeout(() => { if (song === s) song = null; }, sec * 1000 + 50); },
+      setLevel(l) { level = l; fadeTo(vol(), 0.25); },
+      duck() { if (!ac || !song) return; const t = ac.currentTime; musicOut.gain.cancelScheduledValues(t); musicOut.gain.setValueAtTime(vol() * 0.25, t); musicOut.gain.linearRampToValueAtTime(vol(), t + 0.9); },
+      refresh() { if (!settings.music) this.stop(0.2); },
+      get playing() { return !!song; }
+    };
+  })();
+  // how hard a level is, from 0 (part 1) to 1 (endless): drives the music
+  function intensity() {
+    if (!L) return 0.1;
+    if (L.daily) return 0.5 + (L.daily % 5) * 0.08;
+    if (L.endless) return 1;
+    return Math.min(0.95, ((L.part - 1) / 9) * 0.9 + (levelIndex % 10) * 0.008);
+  }
+  const playLevelMusic = () => Music.play(intensity(), L.daily ? 5000 + L.daily : levelIndex + 1);
+  const playMenuMusic = () => Music.play(0.05, 1);
+  // browsers only allow sound after the first tap or key press
+  let audioUnlocked = false;
+  function unlockAudio() {
+    if (audioUnlocked) return;
+    audioUnlocked = true;
+    try { audio(); } catch (e) {}
+    if (state === 'play') playLevelMusic(); else playMenuMusic();
+  }
+  window.addEventListener('pointerdown', unlockAudio, { capture: true });
+  window.addEventListener('keydown', unlockAudio, { capture: true });
   const sfx = {
     coin() { tone(1046, 0.07); tone(1568, 0.1, 'square', 0.05, null, 0.05); },
     key() { [784, 988, 1175].forEach((f, i) => tone(f, 0.09, 'triangle', 0.06, null, i * 0.05)); },
@@ -885,7 +1351,9 @@
   // =====================================================================
   let state = 'menu';
   let L, levelIndex = 0, grid, doorMap, keysRT, gateRT, padsRT, enemies, bouncers, chasers, turrets, bullets, coins;
-  let spawn, player, time, deaths, dying, particles = [], timeLeft, wind, onPad, toast, lockedBuzz = 0;
+  let spawn, player, time, deaths, dying, particles, timeLeft, wind, onPad, toast, lockedBuzz = 0;
+  // animation only: screen shake, red flash on death, expanding rings, level intro banner
+  let shake = 0, flash = 0, rings = [], intro = 0, clock = 0;
 
   function buildEnemy(def) {
     const out = [];
@@ -928,7 +1396,7 @@
 
   function setupLevel(i) {
     levelIndex = i;
-    L = LEVELS[i];
+    L = getLevel(i);
     grid = L.tiles.map((row) => row.split(''));
     doorMap = new Map(L.doors.map((dr) => [K(dr.c, dr.r), { color: dr.color, open: false }]));
     keysRT = L.keys.map((k) => ({ ...k, got: false }));
@@ -941,17 +1409,55 @@
     bullets = [];
     coins = L.coins.map(([c, r]) => ({ x: (c + 0.5) * T, y: (r + 0.5) * T, state: 'free' }));
     spawn = centroidOf('S');
-    player = { x: spawn.x, y: spawn.y, vx: 0, vy: 0, face: [1, 0] };
+    player = { x: spawn.x, y: spawn.y, vx: 0, vy: 0, face: [1, 0], trail: [], spawnT: 0 };
     time = 0; deaths = 0; dying = 0; particles = []; onPad = true;
+    rings = []; shake = 0; flash = 0; intro = 2.2;
     timeLeft = L.mods.timer || 0;
     wind = { dir: [1, 0], t: 3.5 };
     toast = { text: L.tip || '', t: L.tip ? 4.5 : 0 };
   }
+  const OVERLAYS = ['ov-menu', 'ov-clear', 'ov-pause', 'ov-settings'];
+  const showOnly = (id) => { for (const o of OVERLAYS) $(o).hidden = o !== id; $('tools').hidden = !!id; };
   function loadLevel(i) {
     setupLevel(i);
     state = 'play';
-    $('ov-menu').hidden = true;
-    $('ov-clear').hidden = true;
+    showOnly(null);
+    if (audioUnlocked) playLevelMusic();
+  }
+
+  // pause: from the II button, Esc, or automatically when the app goes to the background
+  function pause() {
+    if (state !== 'play') return;
+    state = 'paused';
+    keys.clear(); stick = null;
+    const where = L.daily ? `Daily Needle #${L.daily}` : `Level ${L.part}-${(levelIndex % 10) + 1}`;
+    $('pause-info').textContent = `${where} · ${deaths} deaths so far`;
+    $('p-skip').hidden = !(L.endless && deaths >= 15);
+    showOnly('ov-pause');
+    Music.setLevel(0.3);
+    $('p-resume').focus({ preventScroll: true });
+  }
+  function resume() {
+    if (state !== 'paused') return;
+    state = 'play';
+    showOnly(null);
+    Music.setLevel(1);
+  }
+  let settingsBack = 'ov-menu';
+  function openSettings(from) {
+    settingsBack = from;
+    paintSettings();
+    showOnly('ov-settings');
+    $('s-back').focus({ preventScroll: true });
+  }
+  function paintSettings() {
+    $('s-sound').setAttribute('aria-checked', String(settings.sound));
+    $('s-music').setAttribute('aria-checked', String(settings.music));
+    $('s-haptics').setAttribute('aria-checked', String(settings.haptics));
+    $('s-privacy').hidden = !privacyOptions;
+    if (admob() && !money.adsRemoved) {
+      $('privacy-note').innerHTML = '<b>Privacy:</b> Your progress stays on this device and the game has no accounts. To keep it free, the app shows ads from Google AdMob after every 2 levels. AdMob may use your device\'s advertising ID; you can say no to tracking when asked. See the privacy policy in the store listing.';
+    }
   }
 
   // =====================================================================
@@ -961,10 +1467,9 @@
   window.addEventListener('keydown', (e) => {
     const k = e.key.toLowerCase();
     if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', ' '].includes(k)) e.preventDefault();
-    keys.add(k);
+    if (state === 'play') keys.add(k);
     if (k === 'r' && state === 'play') loadLevel(levelIndex);
-    if (k === 'escape') openMenu();
-    if (k === 'enter' && state === 'clear') $('b-next').click();
+    if (k === 'escape' || k === 'p') { if (state === 'play') pause(); else if (state === 'paused') resume(); }
   });
   window.addEventListener('keyup', (e) => keys.delete(e.key.toLowerCase()));
   window.addEventListener('blur', () => keys.clear());
@@ -1042,16 +1547,33 @@
       particles.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, life: 0, max: 0.4 + Math.random() * 0.4, size: 3 + Math.random() * 4, color });
     }
   }
+  const CONFETTI = ['#ff3b4a', '#ffcc1f', '#33c47a', '#3d6bff', '#a855f7', '#ff9f1c'];
+  function confetti(x, y) {
+    const n = reduced ? 14 : 60;
+    for (let i = 0; i < n; i++) {
+      const a = -Math.PI / 2 + (Math.random() - 0.5) * 2.2, s = 180 + Math.random() * 260;
+      particles.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, life: 0, max: 1.1 + Math.random() * 0.8, size: 4 + Math.random() * 4,
+        color: CONFETTI[i % CONFETTI.length], g: 520, rot: Math.random() * 6, spin: (Math.random() - 0.5) * 14 });
+    }
+    rings.push({ x, y, t: 0, max: 0.7, r: 90, color: '#33c47a' });
+  }
 
   function die() {
     deaths++;
     dying = 0.55;
     sfx.die();
+    haptic('death');
+    Music.duck();
+    shake = reduced ? 0 : 0.3;
+    flash = 0.18;
+    rings.push({ x: player.x, y: player.y, t: 0, max: 0.45, r: 46, color: '#ff3b4a' });
     burst(player.x, player.y, '#ff3b4a', 26);
     coins.forEach((c) => { if (c.state === 'held') c.state = 'free'; });
   }
   function respawn() {
     player.x = spawn.x; player.y = spawn.y; player.vx = 0; player.vy = 0;
+    player.trail = []; player.spawnT = 0;
+    rings.push({ x: spawn.x, y: spawn.y, t: 0, max: 0.4, r: 30, color: '#ffffff' });
     bullets = [];
     chasers.forEach((ch) => { ch.x = ch.hx; ch.y = ch.hy; });
     if (gateRT) gateRT.t = 0;
@@ -1063,10 +1585,25 @@
   // update
   // =====================================================================
   function update(dt) {
+    clock += dt;
     for (let i = particles.length - 1; i >= 0; i--) {
       const p = particles[i];
-      p.life += dt; p.x += p.vx * dt; p.y += p.vy * dt; p.vx *= 0.9; p.vy *= 0.9;
+      p.life += dt; p.x += p.vx * dt; p.y += p.vy * dt;
+      if (p.g) { p.vy += p.g * dt; p.vx *= 0.985; p.rot += p.spin * dt; }
+      else { p.vx *= 0.9; p.vy *= 0.9; }
       if (p.life >= p.max) particles.splice(i, 1);
+    }
+    for (let i = rings.length - 1; i >= 0; i--) { rings[i].t += dt; if (rings[i].t >= rings[i].max) rings.splice(i, 1); }
+    if (shake > 0) shake -= dt;
+    if (flash > 0) flash -= dt;
+    if (intro > 0 && state === 'play') intro -= dt;
+    if (player) {
+      player.spawnT += dt;
+      // a short fading trail behind the player while moving
+      const moving = state === 'play' && dying <= 0 && Math.hypot(player.vx, player.vy) > 20;
+      if (moving && !reduced) player.trail.push({ x: player.x, y: player.y, t: 0 });
+      for (const tr of player.trail) tr.t += dt;
+      while (player.trail.length && (player.trail[0].t > 0.18 || player.trail.length > 10)) player.trail.shift();
     }
     if (state === 'menu') { time += dt; updateMovers(dt); return; }
     if (state !== 'play') return;
@@ -1105,6 +1642,7 @@
       burst(player.x, player.y, '#a855f7', 14);
       player.x = (to[0] + 0.5) * T; player.y = (to[1] + 0.5) * T; player.vx = 0; player.vy = 0;
       burst(player.x, player.y, '#a855f7', 14);
+      rings.push({ x: player.x, y: player.y, t: 0, max: 0.4, r: 34, color: '#a855f7' });
       sfx.zap();
       onPad = true;
     } else if (!pad) onPad = false;
@@ -1139,11 +1677,11 @@
 
     // pickups
     for (const c of coins) {
-      if (c.state === 'free' && circleHitsPlayer(c.x, c.y, 9)) { c.state = 'held'; sfx.coin(); burst(c.x, c.y, '#ffcc1f', 10); }
+      if (c.state === 'free' && circleHitsPlayer(c.x, c.y, 9)) { c.state = 'held'; sfx.coin(); haptic('coin'); burst(c.x, c.y, '#ffcc1f', 10); rings.push({ x: c.x, y: c.y, t: 0, max: 0.35, r: 24, color: '#ffcc1f' }); }
     }
     for (const k of keysRT) {
       if (!k.got && circleHitsPlayer((k.c + 0.5) * T, (k.r + 0.5) * T, 10)) {
-        k.got = true; sfx.key();
+        k.got = true; sfx.key(); haptic('key');
         burst((k.c + 0.5) * T, (k.r + 0.5) * T, KEY_COLORS[k.color], 16);
         doorMap.forEach((dr, key) => { if (dr.color === k.color) { dr.open = true; burst((key % COLS + 0.5) * T, (Math.floor(key / COLS) + 0.5) * T, KEY_COLORS[k.color], 4); } });
       }
@@ -1151,7 +1689,7 @@
 
     if (here === 'C') {
       const cp = centroidOf('C');
-      if (spawn.x !== cp.x || spawn.y !== cp.y) { spawn = cp; sfx.check(); burst(player.x, player.y, '#33c47a', 14); }
+      if (spawn.x !== cp.x || spawn.y !== cp.y) { spawn = cp; sfx.check(); burst(player.x, player.y, '#33c47a', 14); rings.push({ x: cp.x, y: cp.y, t: 0, max: 0.6, r: 60, color: '#33c47a' }); }
       coins.forEach((c) => { if (c.state === 'held') c.state = 'banked'; });
     }
     if (here === 'G') {
@@ -1202,38 +1740,101 @@
     state = 'clear';
     sfx.win();
     burst(player.x, player.y, '#33c47a', 30);
-    const key = String(levelIndex);
-    if (bests[key] === undefined || deaths < bests[key]) bests[key] = deaths;
-    store.set('nr3-bests', bests);
-    const last = levelIndex === LEVELS.length - 1;
-    // the next level only unlocks by finishing this one
-    if (!last && unlocked < levelIndex + 2) { unlocked = levelIndex + 2; store.set('nr3-unlocked', unlocked); }
+    haptic('win');
+    Music.stop(0.3);
+    if (audioUnlocked) setTimeout(() => { if (state === 'clear') playMenuMusic(); }, 1600);
+    confetti(player.x, player.y);
     $('clear-deaths').textContent = deaths;
     $('clear-time').textContent = time.toFixed(1) + 's';
-    $('clear-best').textContent = bests[key];
-    $('clear-title').innerHTML = last ? '<i></i>YOU WON!' : '<i></i>CLEARED';
-    const nextPart = partOf(levelIndex + 1);
-    const total = Object.values(bests).reduce((a, b) => a + b, 0);
-    $('clear-note').textContent = last
-      ? `All ${LEVELS.length} levels beaten. Your fewest deaths across every level add up to ${total}.`
-      : nextPart !== partOf(levelIndex) ? `Part ${nextPart}: ${PARTS[nextPart - 1].name} is unlocked. New tricks and harder levels ahead.`
-      : deaths === 0 ? 'Not a single death. Impressive.' : `Level ${nextPart}-${((levelIndex + 1) % 10) + 1} is unlocked.`;
-    $('b-next').textContent = last ? 'PLAY AGAIN' : 'NEXT LEVEL';
-    setTimeout(() => { $('ov-clear').hidden = false; $('b-next').focus(); }, 450);
+    $('clear-grid').hidden = true;
+    $('b-share').hidden = true;
+    $('b-next').hidden = false;
+    if (L.daily) {
+      // the first clear of the day is the official result; replays are just for fun
+      const dk = 'd' + L.daily, first = !dailyLog[dk];
+      if (first) { dailyLog[dk] = { deaths, time: +time.toFixed(1) }; saveDaily(); }
+      const off = dailyLog[dk];
+      $('clear-best').textContent = off.deaths;
+      $('clear-title').innerHTML = '<i></i>DAILY CLEARED!';
+      $('clear-grid').textContent = shareGrid(off.deaths);
+      $('clear-grid').hidden = false;
+      const st = streak();
+      $('clear-note').textContent = (first ? 'This is your official result for today.' : `Replay done. Your official result stays at ${off.deaths} deaths.`) + ` Streak: ${st} day${st === 1 ? '' : 's'}. A new Daily Needle comes tomorrow.`;
+      $('b-share').hidden = false;
+      $('b-next').hidden = true;
+    } else {
+      const key = String(levelIndex);
+      if (bests[key] === undefined || deaths < bests[key]) bests[key] = deaths;
+      store.set('nr3-bests', bests);
+      // the next level only unlocks by finishing this one; after 100 the endless levels never run out
+      if (unlocked < levelIndex + 2) { unlocked = levelIndex + 2; store.set('nr3-unlocked', unlocked); }
+      $('clear-best').textContent = bests[key];
+      const beatAll = levelIndex === CAMPAIGN - 1;
+      $('clear-title').innerHTML = beatAll ? '<i></i>ALL 100 BEATEN!' : '<i></i>CLEARED';
+      const nextPart = partOf(levelIndex + 1);
+      const total = Object.keys(bests).filter((k) => +k < CAMPAIGN).reduce((a, k) => a + bests[k], 0);
+      $('clear-note').textContent = beatAll
+        ? `You beat every level. Your fewest deaths add up to ${total}. Endless mode is open now: new levels that never run out, and they get faster every 10 levels.`
+        : nextPart !== partOf(levelIndex) && nextPart <= 10 ? `Part ${nextPart}: ${PARTS[nextPart - 1].name} is unlocked. New tricks and harder levels ahead.`
+        : nextPart !== partOf(levelIndex) ? `Endless part ${nextPart} is open. Everything gets a little faster.`
+        : deaths === 0 ? 'Not a single death. Impressive.' : `Level ${nextPart}-${((levelIndex + 1) % 10) + 1} is unlocked.`;
+      $('b-next').textContent = beatAll ? 'GO ENDLESS' : 'NEXT LEVEL';
+    }
+    setTimeout(() => { showOnly('ov-clear'); ($('b-share').hidden ? $('b-next') : $('b-share')).focus(); }, 450);
+    // an ad after every 2nd cleared level (phone app only), shown over the results card
+    setTimeout(maybeShowAd, 900);
+    // build the next endless level now, while the results card is up, so it opens instantly
+    if (!L.daily && levelIndex + 1 >= CAMPAIGN) setTimeout(() => { if (state === 'clear') getLevel(levelIndex + 1); }, 600);
+  }
+
+  // =====================================================================
+  // daily share text: 🟥 for each death, 🟩 for the clear
+  // =====================================================================
+  function shareGrid(d) {
+    const shown = Math.min(d, 12);
+    return '🟥'.repeat(shown) + (d > shown ? `+${d - shown}` : '') + '🟩';
+  }
+  function streak() {
+    let n = dayNumber(), s = 0;
+    if (!dailyLog['d' + n]) n--;
+    while (n > 0 && dailyLog['d' + n]) { s++; n--; }
+    return s;
+  }
+  async function shareDaily() {
+    const n = dayNumber(), r = dailyLog['d' + n];
+    if (!r) return;
+    const text = `Needle Run · Daily #${n}\n💀 ${r.deaths} deaths  ⏱ ${r.time}s\n${shareGrid(r.deaths)}`;
+    const capShare = nativePlugin('Share');
+    try {
+      if (capShare) { await capShare.share({ text }); return; }
+      if (navigator.share) { await navigator.share({ text }); return; }
+    } catch (e) { return; /* share sheet closed */ }
+    try { await navigator.clipboard.writeText(text); showToast('Result copied, paste it anywhere'); }
+    catch (e) { showToast('Could not copy. Take a screenshot instead!'); }
   }
 
   // =====================================================================
   // menu
   // =====================================================================
-  let menuPart = partOf(Math.min(unlocked, LEVELS.length) - 1);
+  // menuPart 1..10 are the 100 levels; 11 and up are endless pages of 10
+  const highestPart = () => partOf(unlocked - 1);
+  let menuPart = highestPart();
   function openMenu() {
     state = 'menu';
-    $('ov-clear').hidden = true;
-    if (L && L.part && levelIndex < unlocked) menuPart = L.part;
-    $('ov-menu').hidden = false;
+    if (L && L.part && levelIndex >= 0 && levelIndex < unlocked) menuPart = L.part;
+    showOnly('ov-menu');
     paintMenu(true);
+    if (audioUnlocked) playMenuMusic();
+    if (unlocked > CAMPAIGN) setTimeout(() => { if (state === 'menu') getLevel(unlocked - 1); }, 400);
+  }
+  function paintDaily() {
+    const n = dayNumber(), r = dailyLog['d' + n];
+    $('daily-name').textContent = `DAILY NEEDLE #${n}`;
+    $('daily-status').textContent = r ? `Cleared · ${r.deaths} deaths · ${shareGrid(r.deaths)}` : 'New level today · same for everyone';
   }
   function paintMenu(focus) {
+    paintDaily();
+    const endless = menuPart > 10;
     const tabs = $('part-tabs');
     tabs.innerHTML = '';
     PARTS.forEach((pt, p) => {
@@ -1247,20 +1848,34 @@
       b.addEventListener('click', () => { menuPart = p + 1; paintMenu(false); });
       tabs.appendChild(b);
     });
+    const eb = document.createElement('button');
+    eb.type = 'button';
+    eb.className = 'part endless' + (endless ? ' on' : '');
+    eb.disabled = unlocked <= CAMPAIGN;
+    eb.textContent = '∞';
+    eb.setAttribute('aria-label', `Endless levels${eb.disabled ? ', locked: beat all 100 levels first' : ''}`);
+    eb.addEventListener('click', () => { menuPart = Math.max(11, highestPart()); paintMenu(false); });
+    tabs.appendChild(eb);
+
     const base = (menuPart - 1) * 10;
     const doneCount = [...Array(10).keys()].filter((k) => bests[base + k] !== undefined).length;
-    $('part-name').textContent = `PART ${menuPart} · ${PARTS[menuPart - 1].name.toUpperCase()}`;
+    $('part-name').textContent = endless ? `ENDLESS · PART ${menuPart}` : `PART ${menuPart} · ${PARTS[menuPart - 1].name.toUpperCase()}`;
     $('part-progress').textContent = `${doneCount}/10 cleared`;
+    $('pager').hidden = !endless;
+    $('pg-prev').disabled = menuPart <= 11;
+    $('pg-next').disabled = menuPart >= highestPart();
     const grd = $('lvl-grid');
     grd.innerHTML = '';
     for (let k = 0; k < 10; k++) {
-      const i = base + k, lv = LEVELS[i], b = document.createElement('button');
+      const i = base + k, b = document.createElement('button');
+      // endless levels are only built when you open them, so the menu shows no names for them
+      const name = endless ? 'Endless' : LEVELS[i].name;
       b.type = 'button';
       b.className = 'lvl' + (bests[i] !== undefined ? ' done' : '');
       b.disabled = i + 1 > unlocked;
-      b.title = lv.name;
-      b.innerHTML = `${k + 1}<small>${b.disabled ? 'locked' : bests[i] !== undefined ? bests[i] + ' deaths' : lv.name.split(' · ').pop()}</small>`;
-      b.setAttribute('aria-label', `Level ${menuPart}-${k + 1}, ${lv.name}${b.disabled ? ', locked' : ''}`);
+      b.title = name;
+      b.innerHTML = `${k + 1}<small>${b.disabled ? 'locked' : bests[i] !== undefined ? bests[i] + ' deaths' : endless ? 'new' : name.split(' · ').pop()}</small>`;
+      b.setAttribute('aria-label', `Level ${menuPart}-${k + 1}, ${name}${b.disabled ? ', locked' : ''}`);
       b.addEventListener('click', () => loadLevel(i));
       grd.appendChild(b);
     }
@@ -1269,30 +1884,73 @@
       if (first) first.focus({ preventScroll: true });
     }
   }
-  $('t-menu').addEventListener('click', openMenu);
+  $('pg-prev').addEventListener('click', () => { menuPart = Math.max(11, menuPart - 1); paintMenu(false); });
+  $('pg-next').addEventListener('click', () => { menuPart = Math.min(highestPart(), menuPart + 1); paintMenu(false); });
+  $('b-daily').addEventListener('click', () => loadLevel(DAILY));
+  $('b-settings').addEventListener('click', () => openSettings('ov-menu'));
   $('t-restart').addEventListener('click', () => { if (state === 'play') loadLevel(levelIndex); });
+  $('t-pause').addEventListener('click', pause);
   $('b-levels').addEventListener('click', openMenu);
-  $('b-next').addEventListener('click', () => loadLevel(levelIndex === LEVELS.length - 1 ? 0 : levelIndex + 1));
-  const paintMute = () => { $('t-mute').textContent = muted ? '×' : '♪'; };
-  $('t-mute').addEventListener('click', () => { muted = !muted; store.set('needle-muted', muted); paintMute(); });
-  paintMute();
+  $('b-share').addEventListener('click', shareDaily);
+  $('b-next').addEventListener('click', () => loadLevel(levelIndex + 1));
+  $('p-resume').addEventListener('click', resume);
+  $('p-restart').addEventListener('click', () => loadLevel(levelIndex));
+  $('p-levels').addEventListener('click', openMenu);
+  $('p-settings').addEventListener('click', () => openSettings('ov-pause'));
+  $('p-skip').addEventListener('click', () => {
+    // endless only: a way out if a level is too much
+    if (unlocked < levelIndex + 2) { unlocked = levelIndex + 2; store.set('nr3-unlocked', unlocked); }
+    loadLevel(levelIndex + 1);
+  });
+  $('s-music').addEventListener('click', () => {
+    settings.music = !settings.music; saveSettings(); paintSettings();
+    if (!settings.music) Music.stop(0.2);
+    else if (settingsBack === 'ov-pause') { playLevelMusic(); Music.setLevel(0.3); }
+    else playMenuMusic();
+  });
+  $('s-sound').addEventListener('click',() => { settings.sound = !settings.sound; saveSettings(); paintSettings(); if (settings.sound) sfx.coin(); });
+  $('s-haptics').addEventListener('click', () => { settings.haptics = !settings.haptics; saveSettings(); paintSettings(); haptic('coin'); });
+  $('s-privacy').addEventListener('click', async () => { try { await admob().showPrivacyOptionsForm(); } catch (e) {} });
+  $('s-back').addEventListener('click', () => {
+    if (settingsBack === 'ov-pause') { showOnly('ov-pause'); $('p-resume').focus({ preventScroll: true }); }
+    else openMenu();
+  });
+  // the app went to the background (call, home button): pause and stop the clock
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) { pause(); if (ac) ac.suspend(); }
+    else if (ac && audioUnlocked) ac.resume();
+  });
+  window.addEventListener('blur', pause);
 
   // =====================================================================
   // drawing
   // =====================================================================
-  const theme = () => PARTS[L.part - 1];
+  const theme = () => PARTS[L.theme !== undefined ? L.theme : L.part - 1];
+  const FONT_D = 'ui-monospace, "SF Mono", Menlo, Consolas, "Courier New", monospace';
+  const FONT_B = 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
   const X = (c) => c * T, Y = (r) => TOP + r * T;
 
   function drawTiles() {
     const th = theme();
     for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
       const ch = grid[r][c], x = X(c), y = Y(r);
-      if (ch === '#') { ctx.fillStyle = th.wall; ctx.fillRect(x, y, T, T); continue; }
+      if (ch === '#') {
+        // walls look like raised blocks: a lit top edge and a shaded front face
+        ctx.fillStyle = th.wall; ctx.fillRect(x, y, T, T);
+        if (tileAt(c, r - 1) !== '#') { ctx.fillStyle = 'rgba(255,255,255,0.16)'; ctx.fillRect(x, y, T, 3); }
+        if (tileAt(c, r + 1) !== '#' && r < ROWS - 1) { ctx.fillStyle = 'rgba(0,0,0,0.32)'; ctx.fillRect(x, y + T - 7, T, 7); }
+        continue;
+      }
       if (isZone(ch)) {
         const locked = ch === 'G' && coins.some((k) => k.state === 'free');
         ctx.fillStyle = locked ? '#cfe9da' : (c + r) % 2 ? '#a9ecc6' : '#9de4bb';
         ctx.fillRect(x, y, T, T);
         if (locked) { ctx.strokeStyle = 'rgba(17,96,58,0.18)'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(x, y + T); ctx.lineTo(x + T, y); ctx.stroke(); }
+        else if (ch === 'G' && !reduced) {
+          // open goal: a bright band sweeps across it
+          const sweep = ((clock * 0.9) % 2.4) * (LW / 2) - 120, d = x + y - TOP - sweep;
+          if (d > -40 && d < 40) { ctx.fillStyle = `rgba(255,255,255,${0.35 * (1 - Math.abs(d) / 40)})`; ctx.fillRect(x, y, T, T); }
+        }
         continue;
       }
       if (ch === 'I') {
@@ -1326,10 +1984,22 @@
     }
     const g = centroidOf('G');
     if (g) {
-      const locked = coins.some((k) => k.state === 'free');
-      ctx.fillStyle = locked ? 'rgba(17,96,58,0.45)' : '#11603a';
-      ctx.font = '700 10px Silkscreen, monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.fillText(locked ? 'LOCKED' : 'GOAL', g.x, TOP + g.y);
+      const locked = coins.some((k) => k.state === 'free'), gx = g.x, gy = TOP + g.y;
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      if (locked) {
+        // padlock
+        ctx.strokeStyle = 'rgba(17,96,58,0.5)'; ctx.lineWidth = 2.5;
+        ctx.beginPath(); ctx.arc(gx, gy - 4, 5, Math.PI, 0); ctx.stroke();
+        ctx.fillStyle = 'rgba(17,96,58,0.5)'; ctx.fillRect(gx - 7, gy - 4, 14, 10);
+      } else {
+        // a little flag that waves
+        const wv = reduced ? 0 : Math.sin(clock * 6) * 2;
+        ctx.fillStyle = '#11603a'; ctx.fillRect(gx - 7, gy - 11, 2.5, 20);
+        ctx.fillStyle = '#ff3b4a';
+        ctx.beginPath(); ctx.moveTo(gx - 4.5, gy - 11); ctx.quadraticCurveTo(gx + 2, gy - 9 + wv, gx + 9, gy - 7 + wv); ctx.lineTo(gx - 4.5, gy - 2); ctx.closePath(); ctx.fill();
+        ctx.fillStyle = '#11603a'; ctx.font = '700 9px ' + FONT_D;
+        ctx.fillText('GOAL', gx, gy + 15);
+      }
     }
   }
 
@@ -1423,9 +2093,21 @@
     ctx.globalAlpha = alpha;
     for (const c of coins) {
       if (c.state !== 'free') continue;
-      ctx.beginPath(); ctx.arc(c.x, TOP + c.y + bob, 8, 0, Math.PI * 2); ctx.fillStyle = '#7a5200'; ctx.fill();
-      ctx.beginPath(); ctx.arc(c.x, TOP + c.y + bob, 6, 0, Math.PI * 2); ctx.fillStyle = '#ffcc1f'; ctx.fill();
-      ctx.fillStyle = '#fff1a8'; ctx.fillRect(c.x - 1.5, TOP + c.y + bob - 3.5, 3, 7);
+      // coins spin: squash them sideways with a cosine
+      const sx = reduced ? 1 : Math.max(0.18, Math.abs(Math.cos(clock * 3 + c.x * 0.05))), cy = TOP + c.y + bob;
+      ctx.fillStyle = 'rgba(0,0,0,0.16)'; ctx.beginPath(); ctx.ellipse(c.x, TOP + c.y + 9, 6 * sx + 1, 2.2, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.save(); ctx.translate(c.x, cy); ctx.scale(sx, 1);
+      ctx.beginPath(); ctx.arc(0, 0, 8, 0, Math.PI * 2); ctx.fillStyle = '#7a5200'; ctx.fill();
+      ctx.beginPath(); ctx.arc(0, 0, 6, 0, Math.PI * 2); ctx.fillStyle = '#ffcc1f'; ctx.fill();
+      ctx.fillStyle = '#fff1a8'; ctx.fillRect(-1.5, -3.5, 3, 7);
+      ctx.restore();
+      // a twinkle now and then
+      const tw = (clock * 0.7 + c.x * 0.013) % 1;
+      if (!reduced && tw < 0.12) {
+        const s = Math.sin((tw / 0.12) * Math.PI) * 4;
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(c.x + 4 - s / 2, cy - 6 - 0.6, s, 1.2); ctx.fillRect(c.x + 4 - 0.6, cy - 6 - s / 2, 1.2, s);
+      }
     }
     for (const k of keysRT) {
       if (k.got) continue;
@@ -1437,20 +2119,55 @@
     ctx.globalAlpha = 1;
   }
 
+  function roundRect(x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y); ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r); ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h); ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r); ctx.quadraticCurveTo(x, y, x + r, y); ctx.closePath();
+  }
   function drawPlayer() {
     const x = player.x, y = TOP + player.y, h = P_SIZE / 2;
-    ctx.fillStyle = '#2a0a10'; ctx.fillRect(x - h - 2, y - h - 2, P_SIZE + 4, P_SIZE + 4);
-    ctx.fillStyle = '#ff3b4a'; ctx.fillRect(x - h + 1, y - h + 1, P_SIZE - 2, P_SIZE - 2);
+    // trail
+    for (const tr of player.trail) {
+      const a = 1 - tr.t / 0.18;
+      ctx.fillStyle = `rgba(255,59,74,${0.22 * a})`;
+      const s = P_SIZE * (0.55 + 0.4 * a);
+      roundRect(tr.x - s / 2, TOP + tr.y - s / 2, s, s, 4); ctx.fill();
+    }
+    // squash and stretch: longer in the direction of travel, plus a small pop when you (re)spawn
+    const sp = Math.hypot(player.vx, player.vy) / P_SIZE / 7;
+    const ax = Math.abs(player.vx) > Math.abs(player.vy);
+    const st = reduced ? 0 : Math.min(0.14, sp * 0.14);
+    const pop = reduced ? 1 : Math.min(1, 0.6 + player.spawnT * 4) + Math.max(0, 0.15 - Math.abs(player.spawnT - 0.12)) ;
+    const breathe = reduced || sp > 0.1 ? 0 : Math.sin(clock * 3) * 0.03;
+    const sx = (ax ? 1 + st : 1 - st * 0.6) * pop * (1 + breathe), sy = (ax ? 1 - st * 0.6 : 1 + st) * pop * (1 - breathe);
+    ctx.fillStyle = 'rgba(0,0,0,0.2)';
+    ctx.beginPath(); ctx.ellipse(x, y + h + 3, h * sx + 1, 3, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.save(); ctx.translate(x, y); ctx.scale(sx, sy);
+    ctx.fillStyle = '#2a0a10'; roundRect(-h - 2, -h - 2, P_SIZE + 4, P_SIZE + 4, 6); ctx.fill();
+    ctx.fillStyle = '#ff3b4a'; roundRect(-h + 1, -h + 1, P_SIZE - 2, P_SIZE - 2, 4); ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,0.28)'; roundRect(-h + 3, -h + 2.5, P_SIZE - 9, 4, 2); ctx.fill();
     const [fx, fy] = player.face;
+    // blink every few seconds
+    const blink = !reduced && (clock % 3.4) < 0.12;
     ctx.fillStyle = '#ffffff';
-    ctx.fillRect(x - 6 + fx * 2, y - 4 + fy * 2, 5, 6); ctx.fillRect(x + 1 + fx * 2, y - 4 + fy * 2, 5, 6);
-    ctx.fillStyle = '#2a0a10';
-    ctx.fillRect(x - 5 + fx * 3.5, y - 2 + fy * 3, 2.5, 3); ctx.fillRect(x + 2 + fx * 3.5, y - 2 + fy * 3, 2.5, 3);
+    if (blink) { ctx.fillRect(-6 + fx * 2, fy * 2, 5, 1.6); ctx.fillRect(1 + fx * 2, fy * 2, 5, 1.6); }
+    else {
+      ctx.fillRect(-6 + fx * 2, -4 + fy * 2, 5, 6); ctx.fillRect(1 + fx * 2, -4 + fy * 2, 5, 6);
+      ctx.fillStyle = '#2a0a10';
+      ctx.fillRect(-5 + fx * 3.5, -2 + fy * 3, 2.5, 3); ctx.fillRect(2 + fx * 3.5, -2 + fy * 3, 2.5, 3);
+    }
+    ctx.restore();
   }
 
   function dot(x, y, fill, edge, r = E_R) {
+    // soft shadow, outline, body and a shiny highlight
+    ctx.fillStyle = 'rgba(0,0,0,0.18)';
+    ctx.beginPath(); ctx.ellipse(x, y + r * 0.85, r * 0.85, r * 0.35, 0, 0, Math.PI * 2); ctx.fill();
     ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fillStyle = edge; ctx.fill();
     ctx.beginPath(); ctx.arc(x, y, r - 2.5, 0, Math.PI * 2); ctx.fillStyle = fill; ctx.fill();
+    ctx.beginPath(); ctx.arc(x - r * 0.3, y - r * 0.32, r * 0.28, 0, Math.PI * 2); ctx.fillStyle = 'rgba(255,255,255,0.55)'; ctx.fill();
   }
   function drawMovers() {
     for (const e of enemies) {
@@ -1481,14 +2198,42 @@
     ctx.fillStyle = g; ctx.fillRect(0, TOP, LW, LH - TOP);
   }
 
+  // level intro: a banner slides in with the level name and a difficulty meter, then fades
+  function drawIntro() {
+    const t = 2.2 - intro;
+    const inF = Math.min(1, t / 0.35), ease = 1 - Math.pow(1 - inF, 3);
+    const alpha = intro < 0.4 ? intro / 0.4 : 1;
+    const cy = TOP + (LH - TOP) / 2, off = reduced ? 0 : (1 - ease) * -LW * 0.6;
+    ctx.globalAlpha = alpha * (reduced ? inF : 1);
+    ctx.fillStyle = 'rgba(20,16,50,0.82)';
+    ctx.fillRect(off, cy - 38, LW, 76);
+    ctx.fillStyle = '#ff3b4a'; ctx.fillRect(off, cy - 38, LW, 3); ctx.fillRect(off, cy + 35, LW, 3);
+    const label = L.daily ? `DAILY NEEDLE #${L.daily}` : L.endless ? `ENDLESS ${L.part}-${(levelIndex % 10) + 1}` : `LEVEL ${L.part}-${(levelIndex % 10) + 1}`;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#ffffff'; ctx.font = '700 24px ' + FONT_D;
+    ctx.fillText(label, LW / 2 - off * 0.3, cy - 11);
+    ctx.fillStyle = '#b9b4e0'; ctx.font = '700 12px ' + FONT_B;
+    ctx.fillText(L.name.toUpperCase(), LW / 2 - off * 0.5, cy + 12);
+    // difficulty: 5 pips that fill up with how hard the level is
+    const lvl = Math.max(1, Math.ceil(intensity() * 5));
+    for (let i = 0; i < 5; i++) {
+      ctx.fillStyle = i < lvl ? (lvl >= 5 ? '#ff3b4a' : lvl >= 3 ? '#ff9f1c' : '#33c47a') : 'rgba(255,255,255,0.15)';
+      ctx.fillRect(LW / 2 - 34 + i * 14 - off * 0.7, cy + 24, 10, 4);
+    }
+    ctx.globalAlpha = 1;
+  }
+
   function drawHud() {
-    ctx.fillStyle = '#1c1840'; ctx.fillRect(0, 0, LW, TOP);
+    const hg = ctx.createLinearGradient(0, 0, 0, TOP);
+    hg.addColorStop(0, '#2a2460'); hg.addColorStop(1, '#1c1840');
+    ctx.fillStyle = hg; ctx.fillRect(0, 0, LW, TOP);
+    ctx.fillStyle = theme().wall; ctx.fillRect(0, TOP - 2, LW, 2);
     ctx.textBaseline = 'middle'; ctx.textAlign = 'left';
-    ctx.fillStyle = '#ffcc1f'; ctx.font = '700 15px Silkscreen, monospace';
-    const label = `${L.part}-${(levelIndex % 10) + 1}`;
+    ctx.fillStyle = '#ffcc1f'; ctx.font = '700 15px ' + FONT_D;
+    const label = L.daily ? `DAILY #${L.daily}` : `${L.part}-${(levelIndex % 10) + 1}`;
     ctx.fillText(label, 12, TOP / 2);
     let x = 22 + ctx.measureText(label).width;
-    ctx.font = '400 12px Silkscreen, monospace';
+    ctx.font = '400 12px ' + FONT_D;
     const deathsText = `DEATHS ${deaths}`, rightEdge = 484;
     const room = rightEdge - ctx.measureText(deathsText).width - 14 - coins.length * 13 - 10 - x;
     let name = L.name.toUpperCase();
@@ -1500,6 +2245,7 @@
     ctx.fillText(name, x, TOP / 2);
     x += ctx.measureText(name).width + 14;
     for (const c of coins) {
+      if (c.state !== 'free') { ctx.beginPath(); ctx.arc(x, TOP / 2, 8, 0, Math.PI * 2); ctx.fillStyle = 'rgba(255,204,31,0.22)'; ctx.fill(); }
       ctx.beginPath(); ctx.arc(x, TOP / 2, 5, 0, Math.PI * 2);
       ctx.fillStyle = c.state === 'free' ? 'rgba(255,255,255,0.2)' : '#ffcc1f'; ctx.fill();
       x += 13;
@@ -1512,7 +2258,7 @@
     if (L.mods.timer) items.push({ text: `TIME ${Math.max(0, Math.ceil(timeLeft))}`, color: timeLeft < 5 ? '#ff6b6b' : '#ffffff' });
     if (L.mods.wind) items.push({ text: 'WIND ' + ({ '1,0': '→', '-1,0': '←', '0,1': '↓', '0,-1': '↑' })[wind.dir.join()], color: '#bfe6ff' });
     if (items.length) {
-      ctx.font = '700 13px Silkscreen, monospace'; ctx.textAlign = 'center';
+      ctx.font = '700 13px ' + FONT_D; ctx.textAlign = 'center';
       const y = Y(11) + T / 2;
       items.forEach((it, i) => {
         const cx = LW / 2 + (i - (items.length - 1) / 2) * 140;
@@ -1523,7 +2269,7 @@
     // tip strip (row 0 is always wall)
     if (toast.t > 0 && toast.text) {
       ctx.globalAlpha = Math.min(1, toast.t / 0.5);
-      ctx.font = '700 11px "Bricolage Grotesque", sans-serif'; ctx.textAlign = 'center';
+      ctx.font = '700 11px ' + FONT_B; ctx.textAlign = 'center';
       const w = Math.min(LW - 20, ctx.measureText(toast.text).width + 24), y = Y(0) + T / 2;
       ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fillRect(LW / 2 - w / 2, y - 11, w, 22);
       ctx.fillStyle = '#ffffff'; ctx.fillText(toast.text, LW / 2, y + 1);
@@ -1535,17 +2281,39 @@
     ctx.setTransform(scale * dpr, 0, 0, scale * dpr, 0, 0);
     ctx.clearRect(0, 0, LW, LH);
     if (!L) setupLevel(0);
+    // screen shake when you get hit
+    if (shake > 0) {
+      const a = (shake / 0.3) * 5;
+      ctx.translate((Math.random() - 0.5) * a * 2, (Math.random() - 0.5) * a * 2);
+    }
     drawTiles();
     drawFixtures();
     drawCoinsKeys(1);
-    if ((state === 'play' && dying <= 0) || state === 'clear') drawPlayer();
+    const showPlayer = ((state === 'play' || state === 'paused') && dying <= 0) || state === 'clear';
+    if (showPlayer) drawPlayer();
     drawMovers();
+    for (const rg of rings) {
+      const f = rg.t / rg.max;
+      ctx.strokeStyle = rg.color; ctx.globalAlpha = (1 - f) * 0.8; ctx.lineWidth = 3 * (1 - f) + 1;
+      ctx.beginPath(); ctx.arc(rg.x, TOP + rg.y, 6 + rg.r * (1 - Math.pow(1 - f, 3)), 0, Math.PI * 2); ctx.stroke();
+    }
     for (const p of particles) {
       ctx.globalAlpha = Math.max(0, 1 - p.life / p.max);
-      ctx.fillStyle = p.color; ctx.fillRect(p.x - p.size / 2, TOP + p.y - p.size / 2, p.size, p.size);
+      ctx.fillStyle = p.color;
+      if (p.g) {
+        // confetti flutters: a thin strip that spins
+        ctx.save(); ctx.translate(p.x, TOP + p.y); ctx.rotate(p.rot); ctx.scale(1, Math.abs(Math.cos(p.rot * 1.7)) + 0.2);
+        ctx.fillRect(-p.size / 2, -p.size / 4, p.size, p.size / 2); ctx.restore();
+      } else ctx.fillRect(p.x - p.size / 2, TOP + p.y - p.size / 2, p.size, p.size);
     }
     ctx.globalAlpha = 1;
-    if (L.mods.dark) { drawDark(); drawCoinsKeys(0.45); if ((state === 'play' && dying <= 0) || state === 'clear') drawPlayer(); }
+    if (L.mods.dark) { drawDark(); drawCoinsKeys(0.45); if (showPlayer) drawPlayer(); }
+    // soft dark edges around the board
+    const vg = ctx.createRadialGradient(LW / 2, TOP + (LH - TOP) / 2, (LH - TOP) * 0.45, LW / 2, TOP + (LH - TOP) / 2, LW * 0.62);
+    vg.addColorStop(0, 'rgba(10,8,30,0)'); vg.addColorStop(1, 'rgba(10,8,30,0.28)');
+    ctx.fillStyle = vg; ctx.fillRect(0, TOP, LW, LH - TOP);
+    if (flash > 0) { ctx.fillStyle = `rgba(255,40,60,${(flash / 0.18) * 0.22})`; ctx.fillRect(0, TOP, LW, LH - TOP); }
+    if (intro > 0 && (state === 'play' || state === 'paused')) drawIntro();
     if (stick && state === 'play') {
       const rc = cv.getBoundingClientRect(), ox = (stick.ox - rc.left) / scale, oy = (stick.oy - rc.top) / scale;
       ctx.strokeStyle = 'rgba(45,39,102,0.35)'; ctx.lineWidth = 3;
@@ -1571,6 +2339,8 @@
   setupLevel(0);
   openMenu();
   requestAnimationFrame(frame);
+  // phone app: start AdMob (consent form and tracking prompt) shortly after launch
+  setTimeout(initAds, 1500);
 })();
 </script>
 </body>
